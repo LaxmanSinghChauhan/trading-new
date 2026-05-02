@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kite Algo Trading - Complete Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .section h4 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border-left: 4px solid #667eea;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .annotation {
+            color: #dcdcaa;
+        }
+
+        .diagram {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram pre {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .badge-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .architecture-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .arch-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .arch-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .arch-box ul {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .flow-diagram {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .flow-step::after {
+            content: '↓';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .nav ul {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Kite Algo Trading Application</h1>
+            <p>Complete Documentation & Architecture Guide</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Java Spring Boot + PostgreSQL + Kite Connect Integration</p>
+        </div>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#project-structure">Project Structure</a></li>
+                <li><a href="#database-design">Database Design</a></li>
+                <li><a href="#api-endpoints">API Endpoints</a></li>
+                <li><a href="#code-walkthrough">Code Walkthrough</a></li>
+                <li><a href="#strategy-implementation">Strategy Implementation</a></li>
+                <li><a href="#deployment">Deployment</a></li>
+            </ul>
+        </nav>
+
+        <div class="section" id="overview">
+            <h2>📋 Project Overview</h2>
+
+            <div class="info-box">
+                <strong>Application Name:</strong> Kite Algo Trading<br>
+                <strong>Version:</strong> 1.0.0<br>
+                <strong>Framework:</strong> Spring Boot 3.2.0<br>
+                <strong>Language:</strong> Java 17<br>
+                <strong>Database:</strong> PostgreSQL 14<br>
+                <strong>Build Tool:</strong> Maven
+            </div>
+
+            <h3>🎯 Purpose</h3>
+            <p>A comprehensive algorithmic trading platform designed for spot trading with automatic detection of sudden price movements in stocks. The application provides real-time market data access, order management, strategy execution, and backtesting capabilities.</p>
+
+            <h3>✨ Key Features</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📊 Real-time Market Data</h4>
+                    <p>Live quotes and historical data via Kite Connect API with WebSocket support for real-time updates.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📈 Order Management</h4>
+                    <p>Complete order lifecycle management with place, modify, cancel operations and risk controls.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎯 Sudden Movement Strategy</h4>
+                    <p>Automated detection of sudden price movements (>2% in 5 minutes) with technical indicators.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🧪 Backtesting Engine</h4>
+                    <p>Test strategies on historical data with detailed performance metrics and analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🖥️ Web Dashboard</h4>
+                    <p>Interactive interface for monitoring, control, and real-time performance tracking.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>💾 PostgreSQL Persistence</h4>
+                    <p>Robust data storage with JPA entities for orders, trades, strategies, and market data.</p>
+                </div>
+            </div>
+
+            <h3>🔧 Technology Stack</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Technology</th>
+                            <th>Version</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Backend Framework</td>
+                            <td>Spring Boot</td>
+                            <td>3.2.0</td>
+                            <td>Application framework</td>
+                        </tr>
+                        <tr>
+                            <td>Language</td>
+                            <td>Java</td>
+                            <td>17</td>
+                            <td>Programming language</td>
+                        </tr>
+                        <tr>
+                            <td>Database</td>
+                            <td>PostgreSQL</td>
+                            <td>14</td>
+                            <td>Data persistence</td>
+                        </tr>
+                        <tr>
+                            <td>ORM</td>
+                            <td>Hibernate</td>
+                            <td>6.3.1</td>
+                            <td>Database abstraction</td>
+                        </tr>
+                        <tr>
+                            <td>Build Tool</td>
+                            <td>Maven</td>
+                            <td>3.8.6</td>
+                            <td>Dependency management</td>
+                        </tr>
+                        <tr>
+                            <td>Security</td>
+                            <td>Spring Security</td>
+                            <td>6.1.1</td>
+                            <td>Authentication & authorization</td>
+                        </tr>
+                        <tr>
+                            <td>Scheduling</td>
+                            <td>Quartz</td>
+                            <td>2.3.2</td>
+                            <td>Task scheduling</td>
+                        </tr>
+                        <tr>
+                            <td>Math Library</td>
+                            <td>Apache Commons Math</td>
+                            <td>3.6.1</td>
+                            <td>Technical indicators</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section" id="architecture">
+            <h2>🏗️ System Architecture</h2>
+
+            <h3>High-Level Architecture</h3>
+            <div class="diagram">
+                <pre>
+┌─────────────────────────────────────────────────────────────────┐
+│                         CLIENT LAYER                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
+│  │   Web App    │  │  Mobile App  │  │  API Client  │              │
+│  │  (Dashboard) │  │  (Future)    │  │  (External)  │              │
+│  └──────────────┘  └──────────────┘  └──────────────┘              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      API GATEWAY LAYER                             │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Spring Boot REST Controllers                 │   │
+│  │  OrderController | MarketDataController | StrategyController│   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      SERVICE LAYER                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │ OrderService │  │MarketDataService│ │StrategyService│          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │BacktestService│ │KiteConnectService│ │ExecutionService│         │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      BUSINESS LOGIC LAYER                          │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Trading Strategies & Analysis               │   │
+│  │  SuddenMovementStrategy | TechnicalIndicators | RiskMgmt  │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      DATA ACCESS LAYER                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │OrderRepository│ │TradeRepository│ │StrategyRepository│         │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│  ┌──────────────┐  ┌──────────────┐                          │
+│  │MarketDataRepo│ │PriceMovementRepo│                         │
+│  └──────────────┘  └──────────────┘                          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      EXTERNAL SERVICES                            │
+│  ┌──────────────┐  ┌──────────────┐                          │
+│  │ Kite Connect │  │  PostgreSQL  │                          │
+│  │     API       │  │   Database   │                          │
+│  └──────────────┘  └──────────────┘                          │
+└─────────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+
+            <h3>Component Architecture</h3>
+            <div class="architecture-diagram">
+                <div class="arch-box">
+                    <h4>🎨 Presentation Layer</h4>
+                    <ul>
+                        <li>REST Controllers</li>
+                        <li>Web Dashboard</li>
+                        <li>API Documentation</li>
+                        <li>CORS Configuration</li>
+                    </ul>
+                </div>
+                <div class="arch-box">
+                    <h4>⚙️ Service Layer</h4>
+                    <ul>
+                        <li>Business Logic</li>
+                        <li>Transaction Management</li>
+                        <li>External API Integration</li>
+                        <li>Scheduled Tasks</li>
+                    </ul>
+                </div>
+                <div class="arch-box">
+                    <h4>🧠 Strategy Layer</h4>
+                    <ul>
+                        <li>Trading Algorithms</li>
+                        <li>Technical Analysis</li>
+                        <li>Signal Generation</li>
+                        <li>Risk Management</li>
+                    </ul>
+                </div>
+                <div class="arch-box">
+                    <h4>💾 Data Layer</h4>
+                    <ul>
+                        <li>JPA Entities</li>
+                        <li>Repository Interfaces</li>
+                        <li>Database Mappings</li>
+                        <li>Query Optimization</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Data Flow Architecture</h3>
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <h4>1. Market Data Ingestion</h4>
+                    <p>Kite Connect API → MarketDataService → Database → WebSocket Updates</p>
+                </div>
+                <div class="flow-step">
+                    <h4>2. Strategy Analysis</h4>
+                    <p>Market Data → Technical Indicators → Signal Generation → Decision Engine</p>
+                </div>
+                <div class="flow-step">
+                    <h4>3. Order Execution</h4>
+                    <p>Trading Signal → Order Validation → Order Placement → Position Tracking</p>
+                </div>
+                <div class="flow-step">
+                    <h4>4. Risk Management</h4>
+                    <p>Position Monitoring → Stop-Loss Check → Take-Profit Check → Exit Execution</p>
+                </div>
+                <div class="flow-step">
+                    <h4>5. Performance Tracking</h4>
+                    <p>Trade Completion → P&L Calculation → Metrics Update → Dashboard Display</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="project-structure">
+            <h2>📁 Project Structure</h2>
+
+            <div class="code-block">
+<pre>
+kite-algo-trading/
+├── <span class="annotation">src/main/java/com/kite/trading/</span>
+│   ├── <span class="annotation">KiteTradingApplication.java</span>          <span class="comment">// Main application entry point</span>
+│   │
+│   ├── <span class="annotation">config/</span>                                   <span class="comment">// Configuration classes</span>
+│   │   ├── KiteConnectConfig.java                <span class="comment">// Kite Connect API configuration</span>
+│   │   ├── DatabaseConfig.java                   <span class="comment">// JPA and database configuration</span>
+│   │   └── SecurityConfig.java                   <span class="comment">// Spring Security configuration</span>
+│   │
+│   ├── <span class="annotation">controller/</span>                              <span class="comment">// REST API endpoints</span>
+│   │   ├── OrderController.java                   <span class="comment">// Order management endpoints</span>
+│   │   ├── MarketDataController.java              <span class="comment">// Market data endpoints</span>
+│   │   ├── StrategyController.java               <span class="comment">// Strategy control endpoints</span>
+│   │   ├── DashboardController.java               <span class="comment">// Dashboard metrics endpoints</span>
+│   │   └── BacktestController.java                <span class="comment">// Backtesting endpoints</span>
+│   │
+│   ├── <span class="annotation">service/</span>                                  <span class="comment">// Business logic layer</span>
+│   │   ├── KiteConnectService.java                <span class="comment">// Kite Connect API wrapper</span>
+│   │   ├── OrderService.java                      <span class="comment">// Order management logic</span>
+│   │   ├── MarketDataService.java                 <span class="comment">// Market data operations</span>
+│   │   ├── BacktestingService.java                <span class="comment">// Backtesting engine</span>
+│   │   └── StrategyExecutionService.java          <span class="comment">// Strategy execution logic</span>
+│   │
+│   ├── <span class="annotation">model/</span>                                    <span class="comment">// JPA entities</span>
+│   │   ├── Order.java                            <span class="comment">// Order entity</span>
+│   │   ├── Trade.java                            <span class="comment">// Trade entity</span>
+│   │   ├── Strategy.java                         <span class="comment">// Strategy entity</span>
+│   │   ├── MarketData.java                       <span class="comment">// Market data entity</span>
+│   │   └── PriceMovement.java                     <span class="comment">// Price movement entity</span>
+│   │
+│   ├── <span class="annotation">repository/</span>                               <span class="comment">// Data access layer</span>
+│   │   ├── OrderRepository.java                   <span class="comment">// Order data access</span>
+│   │   ├── TradeRepository.java                   <span class="comment">// Trade data access</span>
+│   │   ├── StrategyRepository.java                <span class="comment">// Strategy data access</span>
+│   │   ├── MarketDataRepository.java              <span class="comment">// Market data access</span>
+│   │   └── PriceMovementRepository.java            <span class="comment">// Price movement access</span>
+│   │
+│   ├── <span class="annotation">strategy/</span>                                 <span class="comment">// Trading strategies</span>
+│   │   ├── SuddenMovementStrategy.java             <span class="comment">// Sudden movement detection</span>
+│   │   └── StrategyEngine.java                    <span class="comment">// Strategy execution engine</span>
+│   │
+│   └── <span class="annotation">dto/</span>                                       <span class="comment">// Data transfer objects</span>
+│       ├── OrderRequest.java                      <span class="comment">// Order request DTO</span>
+│       ├── BacktestRequest.java                   <span class="comment">// Backtest request DTO</span>
+│       └── BacktestResult.java                    <span class="comment">// Backtest result DTO</span>
+│
+├── <span class="annotation">src/main/resources/</span>
+│   ├── <span class="annotation">static/</span>                                  <span class="comment">// Web dashboard files</span>
+│   │   └── index.html                           <span class="comment">// Main dashboard UI</span>
+│   ├── <span class="annotation">templates/</span>                               <span class="comment">// Server-side templates</span>
+│   └── <span class="annotation">application.properties</span>               <span class="comment">// Application configuration</span>
+│
+├── <span class="annotation">src/test/java/com/kite/trading/</span>           <span class="comment">// Test classes</span>
+│
+├── <span class="annotation">pom.xml</span>                                    <span class="comment">// Maven dependencies</span>
+├── <span class="annotation">Dockerfile</span>                                 <span class="comment">// Docker configuration</span>
+├── <span class="annotation">docker-compose.yml</span>                          <span class="comment">// Multi-container setup</span>
+├── <span class="annotation">README.md</span>                                  <span class="comment">// Project documentation</span>
+└── <span class="annotation">.env</span>                                       <span class="comment">// Environment variables</span>
+</pre>
+            </div>
+
+            <h3>Package Responsibilities</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th>Responsibility</th>
+                            <th>Key Classes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>config</code></td>
+                            <td>Application configuration and bean definitions</td>
+                            <td>KiteConnectConfig, DatabaseConfig, SecurityConfig</td>
+                        </tr>
+                        <tr>
+                            <td><code>controller</code></td>
+                            <td>REST API endpoints and request handling</td>
+                            <td>OrderController, MarketDataController, StrategyController</td>
+                        </tr>
+                        <tr>
+                            <td><code>service</code></td>
+                            <td>Business logic and external service integration</td>
+                            <td>OrderService, MarketDataService, BacktestingService</td>
+                        </tr>
+                        <tr>
+                            <td><code>model</code></td>
+                            <td>Database entities and data models</td>
+                            <td>Order, Trade, Strategy, MarketData</td>
+                        </tr>
+                        <tr>
+                            <td><code>repository</code></td>
+                            <td>Data access and database operations</td>
+                            <td>OrderRepository, TradeRepository, StrategyRepository</td>
+                        </tr>
+                        <tr>
+                            <td><code>strategy</code></td>
+                            <td>Trading algorithms and strategy execution</td>
+                            <td>SuddenMovementStrategy, StrategyEngine</td>
+                        </tr>
+                        <tr>
+                            <td><code>dto</code></td>
+                            <td>Data transfer objects for API communication</td>
+                            <td>OrderRequest, BacktestRequest, BacktestResult</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section" id="database-design">
+            <h2>💾 Database Design</h2>
+
+            <h3>Entity Relationship Diagram</h3>
+            <div class="diagram">
+                <pre>
+┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
+│     STRATEGIES   │         │      ORDERS     │         │      TRADES     │
+├─────────────────┤         ├─────────────────┤         ├─────────────────┤
+│ id (PK)         │         │ id (PK)         │         │ id (PK)         │
+│ strategy_id (UK)│         │ order_id (UK)   │         │ trade_id (UK)   │
+│ name            │         │ symbol          │         │ symbol          │
+│ type            │         │ order_type      │         │ trade_type      │
+│ parameters      │         │ transaction_type│         │ entry_price     │
+│ is_active       │         │ quantity        │         │ exit_price      │
+│ paper_trading   │         │ price           │         │ pnl             │
+│ total_trades    │         │ status          │         │ status          │
+│ total_pnl       │         │ paper_trading   │         │ paper_trading   │
+│ win_rate        │         │ created_at      │         │ strategy_name   │
+│ created_at      │         │ updated_at      │         │ entry_time      │
+│ last_executed   │         └─────────────────┘         │ exit_time       │
+└─────────────────┘                  │                  └─────────────────┘
+         │                            │                           │
+         │                            │                           │
+         ▼                            ▼                           ▼
+┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
+│  MARKET_DATA    │         │ PRICE_MOVEMENTS │         │                 │
+├─────────────────┤         ├─────────────────┤         │                 │
+│ id (PK)         │         │ id (PK)         │         │                 │
+│ symbol          │         │ symbol          │         │                 │
+│ timestamp       │         │ timestamp       │         │                 │
+│ open            │         │ start_price     │         │                 │
+│ high            │         │ end_price       │         │                 │
+│ low             │         │ percentage_change│         │                 │
+│ close           │         │ volume          │         │                 │
+│ volume          │         │ timeframe_minutes│         │                 │
+│ data_interval   │         │ movement_type   │         │                 │
+│ vwap            │         │ rsi             │         │                 │
+└─────────────────┘         │ macd            │         │                 │
+                            │ signal_line     │         │                 │
+                            │ signal_generated│         │                 │
+                            └─────────────────┘         │                 │
+                                                            │
+                                                            │
+                                                            ▼
+                                                ┌─────────────────┐
+                                                │  INDEXES        │
+                                                ├─────────────────┤
+                                                │ idx_symbol      │
+                                                │ idx_timestamp   │
+                                                │ idx_status      │
+                                                │ idx_active      │
+                                                └─────────────────┘
+                </pre>
+            </div>
+
+            <h3>Table Descriptions</h3>
+
+            <h4>📋 Orders Table</h4>
+            <p>Stores all trading orders with complete lifecycle tracking.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Constraints</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>id</td>
+                            <td>bigint</td>
+                            <td>Primary key</td>
+                            <td>Auto-increment</td>
+                        </tr>
+                        <tr>
+                            <td>order_id</td>
+                            <td>varchar(255)</td>
+                            <td>Unique order identifier</td>
+                            <td>UNIQUE, NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td>symbol</td>
+                            <td>varchar(255)</td>
+                            <td>Trading symbol</td>
+                            <td>NOT NULL, INDEXED</td>
+                        </tr>
+                        <tr>
+                            <td>order_type</td>
+                            <td>varchar(255)</td>
+                            <td>Order type (MARKET, LIMIT, etc.)</td>
+                            <td>NOT NULL, CHECK constraint</td>
+                        </tr>
+                        <tr>
+                            <td>transaction_type</td>
+                            <td>varchar(255)</td>
+                            <td>BUY or SELL</td>
+                            <td>NOT NULL, CHECK constraint</td>
+                        </tr>
+                        <tr>
+                            <td>quantity</td>
+                            <td>integer</td>
+                            <td>Order quantity</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td>price</td>
+                            <td>numeric(38,2)</td>
+                            <td>Order price</td>
+                            <td>NULLABLE</td>
+                        </tr>
+                        <tr>
+                            <td>status</td>
+                            <td>varchar(255)</td>
+                            <td>Order status</td>
+                            <td>NOT NULL, CHECK constraint, INDEXED</td>
+                        </tr>
+                        <tr>
+                            <td>paper_trading</td>
+                            <td>boolean</td>
+                            <td>Paper trading flag</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td>created_at</td>
+                            <td>timestamp</td>
+                            <td>Order creation time</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                        <tr>
+                            <td>updated_at</td>
+                            <td>timestamp</td>
+                            <td>Last update time</td>
+                            <td>NOT NULL</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>📊 Trades Table</h4>
+            <p>Records completed trades with performance metrics.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>id</td>
+                            <td>bigint</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td>trade_id</td>
+                            <td>varchar(255)</td>
+                            <td>Unique trade identifier</td>
+                        </tr>
+                        <tr>
+                            <td>symbol</td>
+                            <td>varchar(255)</td>
+                            <td>Trading symbol</td>
+                        </tr>
+                        <tr>
+                            <td>trade_type</td>
+                            <td>varchar(255)</td>
+                            <td>LONG or SHORT</td>
+                        </tr>
+                        <tr>
+                            <td>entry_price</td>
+                            <td>numeric(19,4)</td>
+                            <td>Entry price</td>
+                        </tr>
+                        <tr>
+                            <td>exit_price</td>
+                            <td>numeric(19,4)</td>
+                            <td>Exit price</td>
+                        </tr>
+                        <tr>
+                            <td>pnl</td>
+                            <td>numeric(19,4)</td>
+                            <td>Profit/Loss amount</td>
+                        </tr>
+                        <tr>
+                            <td>pnl_percentage</td>
+                            <td>numeric(5,2)</td>
+                            <td>P&L percentage</td>
+                        </tr>
+                        <tr>
+                            <td>status</td>
+                            <td>varchar(255)</td>
+                            <td>Trade status</td>
+                        </tr>
+                        <tr>
+                            <td>strategy_name</td>
+                            <td>varchar(255)</td>
+                            <td>Strategy that generated trade</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>🎯 Strategies Table</h4>
+            <p>Stores trading strategy configurations and performance metrics.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>id</td>
+                            <td>bigint</td>
+                            <td>Primary key</td>
+                        </tr>
+                        <tr>
+                            <td>strategy_id</td>
+                            <td>varchar(255)</td>
+                            <td>Unique strategy identifier</td>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>varchar(255)</td>
+                            <td>Strategy name</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>varchar(255)</td>
+                            <td>Strategy type</td>
+                        </tr>
+                        <tr>
+                            <td>parameters</td>
+                            <td>oid</td>
+                            <td>Strategy parameters (JSON)</td>
+                        </tr>
+                        <tr>
+                            <td>is_active</td>
+                            <td>boolean</td>
+                            <td>Active status</td>
+                        </tr>
+                        <tr>
+                            <td>total_trades</td>
+                            <td>integer</td>
+                            <td>Total trades executed</td>
+                        </tr>
+                        <tr>
+                            <td>total_pnl</td>
+                            <td>numeric(19,4)</td>
+                            <td>Total profit/loss</td>
+                        </tr>
+                        <tr>
+                            <td>win_rate</td>
+                            <td>numeric(5,2)</td>
+                            <td>Win rate percentage</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Database Indexes</h3>
+            <div class="info-box">
+                <strong>Performance Optimization Indexes:</strong>
+                <ul>
+                    <li><code>idx_symbol</code> - Fast symbol-based queries</li>
+                    <li><code>idx_timestamp</code> - Time-based data retrieval</li>
+                    <li><code>idx_symbol_timestamp</code> - Composite index for time-series queries</li>
+                    <li><code>idx_status</code> - Order status filtering</li>
+                    <li><code>idx_active</code> - Active strategy queries</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="api-endpoints">
+            <h2>🔌 API Endpoints</h2>
+
+            <h3>Order Management</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Request Body</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-primary">POST</span></td>
+                            <td><code>/api/orders</code></td>
+                            <td>Place new order</td>
+                            <td>OrderRequest</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-primary">PUT</span></td>
+                            <td><code>/api/orders/{orderId}</code></td>
+                            <td>Modify existing order</td>
+                            <td>OrderModification</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-warning">DELETE</span></td>
+                            <td><code>/api/orders/{orderId}</code></td>
+                            <td>Cancel order</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/orders/{orderId}</code></td>
+                            <td>Get order status</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/orders</code></td>
+                            <td>Get all orders</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/orders/symbol/{symbol}</code></td>
+                            <td>Get orders by symbol</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/orders/positions</code></td>
+                            <td>Get current positions</td>
+                            <td>None</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Market Data</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/market/quote/{symbol}</code></td>
+                            <td>Get live quote</td>
+                            <td>symbol (path)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/market/quotes</code></td>
+                            <td>Get multiple quotes</td>
+                            <td>symbols (query param)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/market/historical/{symbol}</code></td>
+                            <td>Get historical data</td>
+                            <td>symbol, from, to, interval</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/market/price/{symbol}</code></td>
+                            <td>Get current price</td>
+                            <td>symbol (path)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/market/change-percent/{symbol}</code></td>
+                            <td>Get day change percentage</td>
+                            <td>symbol (path)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Strategy Management</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-primary">POST</span></td>
+                            <td><code>/api/strategies</code></td>
+                            <td>Create new strategy</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/strategies</code></td>
+                            <td>Get all strategies</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/strategies/active</code></td>
+                            <td>Get active strategies</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-primary">PUT</span></td>
+                            <td><code>/api/strategies/{id}</code></td>
+                            <td>Update strategy</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-primary">PUT</span></td>
+                            <td><code>/api/strategies/{id}/activate</code></td>
+                            <td>Activate strategy</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-primary">POST</span></td>
+                            <td><code>/api/strategies/{id}/execute</code></td>
+                            <td>Execute strategy</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Backtesting</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-primary">POST</span></td>
+                            <td><code>/api/backtest/run</code></td>
+                            <td>Run backtest with request body</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-primary">GET</span></td>
+                            <td><code>/api/backtest/run</code></td>
+                            <td>Run backtest with query parameters</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Dashboard</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/dashboard/overview</code></td>
+                            <td>Get dashboard overview statistics</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/dashboard/recent-orders</code></td>
+                            <td>Get recent orders</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/dashboard/open-positions</code></td>
+                            <td>Get open positions</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-success">GET</span></td>
+                            <td><code>/api/dashboard/performance</code></td>
+                            <td>Get performance metrics</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section" id="code-walkthrough">
+            <h2>📝 Code Walkthrough</h2>
+
+            <h3>1. Application Entry Point</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@SpringBootApplication</span>
+<span class="annotation">@EnableScheduling</span>
+<span class="keyword">public class</span> <span class="annotation">KiteTradingApplication</span> {
+
+    <span class="keyword">public static void</span> <span class="annotation">main</span>(String[] args) {
+        SpringApplication.run(KiteTradingApplication.class, args);
+    }
+}
+</pre>
+            </div>
+            <div class="info-box">
+                <strong>Purpose:</strong> Main Spring Boot application class with scheduling enabled for automated tasks.
+            </div>
+
+            <h3>2. Kite Connect Configuration</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@Configuration</span>
+<span class="annotation">@ConfigurationProperties</span>(prefix = <span class="string">"kite"</span>)
+<span class="keyword">public class</span> <span class="annotation">KiteConnectConfig</span> {
+
+    <span class="keyword">private</span> String apiKey;
+    <span class="keyword">private</span> String apiSecret;
+    <span class="keyword">private</span> String apiUrl = <span class="string">"https://api.kite.trade"</span>;
+
+    <span class="annotation">@Bean</span>
+    <span class="keyword">public</span> MockKiteConnect mockKiteConnect() {
+        <span class="keyword">return new</span> MockKiteConnect(apiKey, apiSecret);
+    }
+}
+</pre>
+            </div>
+            <div class="info-box">
+                <strong>Purpose:</strong> Configures Kite Connect API credentials and creates the mock service bean for testing.
+            </div>
+
+            <h3>3. Order Entity</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@Entity</span>
+<span class="annotation">@Data</span>
+<span class="annotation">@Table</span>(name = <span class="string">"orders"</span>, indexes = {
+    <span class="annotation">@Index</span>(name = <span class="string">"idx_symbol"</span>, columnList = <span class="string">"symbol"</span>),
+    <span class="annotation">@Index</span>(name = <span class="string">"idx_status"</span>, columnList = <span class="string">"status"</span>)
+})
+<span class="keyword">public class</span> <span class="annotation">Order</span> {
+
+    <span class="annotation">@Id</span>
+    <span class="annotation">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="keyword">private</span> Long id;
+
+    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>, unique = <span class="keyword">true</span>)
+    <span class="keyword">private</span> String orderId;
+
+    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)
+    <span class="keyword">private</span> String symbol;
+
+    <span class="annotation">@Enumerated</span>(EnumType.STRING)
+    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)
+    <span class="keyword">private</span> OrderType orderType;
+
+    <span class="annotation">@Enumerated</span>(EnumType.STRING)
+    <span class="annotation">@Column</span>(nullable = <span class="keyword">false</span>)
+    <span class="keyword">private</span> TransactionType transactionType;
+
+    <span class="comment">// ... other fields</span>
+
+    <span class="keyword">public enum</span> OrderType {
+        MARKET, LIMIT, STOP_LOSS_MARKET, STOP_LOSS_LIMIT
+    }
+
+    <span class="keyword">public enum</span> TransactionType {
+        BUY, SELL
+    }
+}
+</pre>
+            </div>
+            <div class="info-box">
+                <strong>Purpose:</strong> JPA entity representing trading orders with database mapping and constraints.
+            </div>
+
+            <h3>4. Order Service</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@Service</span>
+<span class="annotation">@RequiredArgsConstructor</span>
+<span class="keyword">public class</span> <span class="annotation">OrderService</span> {
+
+    <span class="keyword">private final</span> KiteConnectService kiteConnectService;
+    <span class="keyword">private final</span> OrderRepository orderRepository;
+
+    <span class="annotation">@Value</span>(<span class="string">"${trading.paper-trading:true}"</span>)
+    <span class="keyword">private boolean</span> paperTrading;
+
+    <span class="annotation">@Transactional</span>
+    <span class="keyword">public</span> Order placeOrder(OrderRequest request) <span class="keyword">throws</span> Exception {
+        <span class="comment">// Validate request</span>
+        validateOrderRequest(request);
+
+        <span class="comment">// Create order from request</span>
+        Order order = createOrderFromRequest(request);
+
+        <span class="comment">// Execute order based on trading mode</span>
+        <span class="keyword">if</span> (paperTrading) {
+            order = placePaperOrder(order);
+        } <span class="keyword">else</span> {
+            order = placeRealOrder(order);
+        }
+
+        <span class="comment">// Save and return</span>
+        <span class="keyword">return</span> orderRepository.save(order);
+    }
+
+    <span class="keyword">private void</span> validateOrderRequest(OrderRequest request) {
+        <span class="keyword">if</span> (request.getSymbol() == <span class="keyword">null</span> || request.getSymbol().isEmpty()) {
+            <span class="keyword">throw new</span> IllegalArgumentException(<span class="string">"Symbol is required"</span>);
+        }
+        <span class="comment">// ... other validations</span>
+    }
+}
+</pre>
+            </div>
+            <div class="info-box">
+                <strong>Purpose:</strong> Business logic for order management with validation, paper trading support, and risk controls.
+            </div>
+
+            <h3>5. Order Controller</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@RestController</span>
+<span class="annotation">@RequestMapping</span>(<span class="string">"/api/orders"</span>)
+<span class="annotation">@RequiredArgsConstructor</span>
+<span class="annotation">@CrossOrigin</span>(origins = <span class="string">"*"</span>)
+<span class="keyword">public class</span> <span class="annotation">OrderController</span> {
+
+    <span class="keyword">private final</span> OrderService orderService;
+
+    <span class="annotation">@PostMapping</span>
+    <span class="keyword">public</span> ResponseEntity<Order> placeOrder(
+            <span class="annotation">@RequestBody</span> OrderService.OrderRequest request) {
+        <span class="keyword">try</span> {
+            Order order = orderService.placeOrder(request);
+            <span class="keyword">return</span> ResponseEntity.ok(order);
+        } <span class="keyword">catch</span> (Exception e) {
+            <span class="keyword">return</span> ResponseEntity.badRequest().build();
+        }
+    }
+
+    <span class="annotation">@GetMapping</span>
+    <span class="keyword">public</span> ResponseEntity<List<Order>> getAllOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        <span class="keyword">return</span> ResponseEntity.ok(orders);
+    }
+
+    <span class="annotation">@DeleteMapping</span>(<span class="string">"/{orderId}"</span>)
+    <span class="keyword">public</span> ResponseEntity<Order> cancelOrder(<span class="annotation">@PathVariable</span> String orderId) {
+        <span class="keyword">try</span> {
+            Order order = orderService.cancelOrder(orderId);
+            <span class="keyword">return</span> ResponseEntity.ok(order);
+        } <span class="keyword">catch</span> (Exception e) {
+            <span class="keyword">return</span> ResponseEntity.badRequest().build();
+        }
+    }
+}
+</pre>
+            </div>
+            <div class="info-box">
+                <strong>Purpose:</strong> REST API endpoints for order management with proper error handling and CORS support.
+            </div>
+
+            <h3>6. Market Data Service</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@Service</span>
+<span class="annotation">@RequiredArgsConstructor</span>
+<span class="keyword">public class</span> <span class="annotation">MarketDataService</span> {
+
+    <span class="keyword">private final</span> KiteConnectService kiteConnectService;
+    <span class="keyword">private final</span> MarketDataRepository marketDataRepository;
+
+    <span class="annotation">@Cacheable</span>(value = <span class="string">"historicalData"</span>)
+    <span class="keyword">public</span> List<MarketData> getHistoricalData(
+            String symbol, Date from, Date to, String interval) <span class="keyword">throws</span> Exception {
+        <span class="comment">// Fetch from Kite Connect API</span>
+        List<MockHistoricalData> historicalDataList =
+                kiteConnectService.getHistoricalData(symbol, from, to, interval);
+
+        <span class="comment">// Convert to domain entities</span>
+        <span class="keyword">return</span> historicalDataList.stream()
+                .map(<span class="keyword">this</span>::convertToMarketData)
+                .collect(Collectors.toList());
+    }
+
+    <span class="annotation">@Scheduled</span>(fixedRate = 60000)
+    <span class="keyword">public void</span> fetchAndStoreLiveQuotes() {
+        <span class="comment">// Fetch live quotes every minute</span>
+        List<String> watchedSymbols = getWatchedSymbols();
+        Map<String, MockQuote> quotes = kiteConnectService.getQuotes(watchedSymbols);
+
+        <span class="comment">// Store in database</span>
+        <span class="keyword">for</span> (Map.Entry<String, MockQuote> entry : quotes.entrySet()) {
+            MarketData marketData = convertQuoteToMarketData(
+                    entry.getKey(), entry.getValue());
+            marketDataRepository.save(marketData);
+        }
+    }
+}
+</pre>
+            </div>
+            <div class="info-box">
+                <strong>Purpose:</strong> Handles market data operations with caching and scheduled live quote fetching.
+            </div>
+
+            <h3>7. Repository Interface</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@Repository</span>
+<span class="keyword">public interface</span> <span class="annotation">OrderRepository</span> <span class="keyword">extends</span> JpaRepository<Order, Long> {
+
+    Optional<Order> findByOrderId(String orderId);
+
+    List<Order> findBySymbol(String symbol);
+
+    List<Order> findByStatus(Order.OrderStatus status);
+
+    <span class="annotation">@Query</span>(<span class="string">"SELECT o FROM Order o WHERE o.createdAt BETWEEN :startDate AND :endDate"</span>)
+    List<Order> findByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Order> findByPaperTradingFalseOrderByCreatedAtDesc();
+}
+</pre>
+            </div>
+            <div class="info-box">
+                <strong>Purpose:</strong> Spring Data JPA repository with custom query methods for order data access.
+            </div>
+        </div>
+
+        <div class="section" id="strategy-implementation">
+            <h2>🎯 Strategy Implementation</h2>
+
+            <h3>Sudden Movement Strategy Architecture</h3>
+            <div class="diagram">
+                <pre>
+┌─────────────────────────────────────────────────────────────┐
+│              SUDDEN MOVEMENT STRATEGY                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. DATA COLLECTION                                        │
+│     ├─ Fetch recent price data (last N candles)               │
+│     ├─ Calculate volume metrics                            │
+│     └─ Store in memory buffer                                │
+│                                                              │
+│  2. MOVEMENT DETECTION                                     │
+│     ├─ Calculate percentage change                           │
+│     ├─ Compare with threshold (default: 2%)                  │
+│     ├─ Check volume spike (1.5x average)                      │
+│     └─ Classify: SUDDEN_RISE, SUDDEN_FALL, NORMAL          │
+│                                                              │
+│  3. TECHNICAL ANALYSIS                                     │
+│     ├─ Calculate RSI (14-period)                            │
+│     ├─ Calculate MACD (12, 26, 9)                            │
+│     ├─ Analyze signal line crossover                         │
+│     └─ Determine trend direction                            │
+│                                                              │
+│  4. SIGNAL GENERATION                                      │
+│     ├─ Combine movement + technical indicators               │
+│     ├─ Apply confidence scoring                              │
+│     ├─ Generate: BUY, SELL, HOLD                             │
+│     └─ Set confidence threshold (default: 70%)                │
+│                                                              │
+│  5. RISK MANAGEMENT                                         │
+│     ├─ Calculate stop-loss (2% from entry)                   │
+│     ├─ Calculate take-profit (4% from entry)                  │
+│     ├─ Validate position sizing                              │
+│     └─ Check exposure limits                                 │
+│                                                              │
+│  6. ORDER EXECUTION                                        │
+│     ├─ Place entry order                                    │
+│     ├─ Set stop-loss and take-profit orders                  │
+│     ├─ Monitor position in real-time                         │
+│     └─ Execute exit on trigger                               │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+
+            <h3>Core Strategy Code</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@Component</span>
+<span class="keyword">public class</span> <span class="annotation">SuddenMovementStrategy</span> {
+
+    <span class="annotation">@Value</span>(<span class="string">"${strategy.sudden-movement.threshold:2.0}"</span>)
+    <span class="keyword">private double</span> movementThreshold;
+
+    <span class="keyword">public</span> List<PriceMovement> detectSuddenMovements(
+            String symbol, List<BigDecimal> prices, List<Long> volumes) {
+
+        List<PriceMovement> movements = <span class="keyword">new</span> ArrayList<>();
+
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 1; i < prices.size(); i++) {
+            BigDecimal currentPrice = prices.get(i);
+            BigDecimal previousPrice = prices.get(i - 1);
+
+            <span class="comment">// Calculate percentage change</span>
+            BigDecimal percentageChange = calculatePercentageChange(
+                    previousPrice, currentPrice);
+
+            <span class="comment">// Check if movement exceeds threshold</span>
+            <span class="keyword">if</span> (Math.abs(percentageChange.doubleValue()) >= movementThreshold) {
+                PriceMovement movement = createPriceMovement(
+                        symbol, previousPrice, currentPrice,
+                        percentageChange, volumes.get(i),
+                        determineMovementType(percentageChange));
+                movements.add(movement);
+            }
+        }
+
+        <span class="keyword">return</span> movements;
+    }
+
+    <span class="keyword">public</span> BigDecimal calculateRSI(List<BigDecimal> prices, <span class="keyword">int</span> period) {
+        <span class="comment">// Calculate RSI using standard formula</span>
+        List<BigDecimal> gains = <span class="keyword">new</span> ArrayList<>();
+        List<BigDecimal> losses = <span class="keyword">new</span> ArrayList<>();
+
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = 1; i < prices.size(); i++) {
+            BigDecimal change = prices.get(i).subtract(prices.get(i - 1));
+            <span class="keyword">if</span> (change.compareTo(BigDecimal.ZERO) > 0) {
+                gains.add(change);
+                losses.add(BigDecimal.ZERO);
+            } <span class="keyword">else</span> {
+                gains.add(BigDecimal.ZERO);
+                losses.add(change.abs());
+            }
+        }
+
+        BigDecimal avgGain = calculateAverage(
+                gains.subList(gains.size() - period, gains.size()));
+        BigDecimal avgLoss = calculateAverage(
+                losses.subList(losses.size() - period, losses.size()));
+
+        <span class="keyword">if</span> (avgLoss.compareTo(BigDecimal.ZERO) == 0) {
+            <span class="keyword">return</span> BigDecimal.valueOf(100);
+        }
+
+        BigDecimal rs = avgGain.divide(avgLoss, 4, RoundingMode.HALF_UP);
+        BigDecimal rsi = BigDecimal.valueOf(100).subtract(
+                BigDecimal.valueOf(100).divide(BigDecimal.ONE.add(rs),
+                        2, RoundingMode.HALF_UP));
+
+        <span class="keyword">return</span> rsi;
+    }
+
+    <span class="keyword">public</span> TradingSignal generateTradingSignal(
+            PriceMovement movement, BigDecimal rsi, MACDResult macd) {
+
+        TradingSignal signal = <span class="keyword">new</span> TradingSignal();
+        signal.setSymbol(movement.getSymbol());
+        signal.setMovementType(movement.getMovementType());
+
+        <span class="keyword">if</span> (movement.getMovementType() == MovementType.SUDDEN_RISE) {
+            <span class="comment">// Buy signal conditions</span>
+            <span class="keyword">if</span> (rsi.compareTo(BigDecimal.valueOf(70)) < 0 &&
+                macd.getHistogram().compareTo(BigDecimal.ZERO) > 0) {
+                signal.setSignalType(SignalType.BUY);
+                signal.setConfidence(calculateConfidence(movement, rsi, macd, <span class="keyword">true</span>));
+            } <span class="keyword">else</span> {
+                signal.setSignalType(SignalType.HOLD);
+            }
+        } <span class="keyword">else if</span> (movement.getMovementType() == MovementType.SUDDEN_FALL) {
+            <span class="comment">// Sell signal conditions</span>
+            <span class="keyword">if</span> (rsi.compareTo(BigDecimal.valueOf(30)) > 0 &&
+                macd.getHistogram().compareTo(BigDecimal.ZERO) < 0) {
+                signal.setSignalType(SignalType.SELL);
+                signal.setConfidence(calculateConfidence(movement, rsi, macd, <span class="keyword">false</span>));
+            } <span class="keyword">else</span> {
+                signal.setSignalType(SignalType.HOLD);
+            }
+        }
+
+        <span class="keyword">return</span> signal;
+    }
+}
+</pre>
+            </div>
+
+            <h3>Strategy Execution Engine</h3>
+            <div class="code-block">
+<pre>
+<span class="annotation">@Component</span>
+<span class="keyword">public class</span> <span class="annotation">StrategyEngine</span> {
+
+    <span class="annotation">@Scheduled</span>(fixedRateString = <span class="string">"${strategy.execution.interval:60000}"</span>)
+    <span class="keyword">public void</span> executeStrategies() {
+        List<Strategy> activeStrategies = strategyRepository.findByIsActiveTrue();
+
+        <span class="keyword">for</span> (Strategy strategy : activeStrategies) {
+            <span class="keyword">switch</span> (strategy.getType()) {
+                <span class="keyword">case</span> SUDDEN_MOVEMENT:
+                    executeSuddenMovementStrategy(strategy);
+                    <span class="keyword">break</span>;
+                <span class="comment">// ... other strategy types</span>
+            }
+        }
+    }
+
+    <span class="keyword">private void</span> executeSuddenMovementStrategy(Strategy strategy) {
+        List<String> watchedSymbols = getWatchedSymbols(strategy);
+
+        <span class="keyword">for</span> (String symbol : watchedSymbols) {
+            <span class="comment">// Get recent price data</span>
+            List<BigDecimal> recentPrices = getRecentPrices(symbol, 10);
+            List<Long> recentVolumes = getRecentVolumes(symbol, 10);
+
+            <span class="comment">// Detect sudden movements</span>
+            List<PriceMovement> movements =
+                    suddenMovementStrategy.detectSuddenMovements(
+                            symbol, recentPrices, recentVolumes);
+
+            <span class="comment">// Process each movement</span>
+            <span class="keyword">for</span> (PriceMovement movement : movements) {
+                processMovement(movement, strategy);
+            }
+        }
+    }
+
+    <span class="annotation">@Scheduled</span>(fixedRate = 30000)
+    <span class="keyword">public void</span> monitorOpenPositions() {
+        <span class="comment">// Check exit conditions every 30 seconds</span>
+        checkExitConditions();
+    }
+
+    <span class="keyword">private void</span> checkExitConditions() {
+        List<Trade> openTrades = getOpenTrades();
+
+        <span class="keyword">for</span> (Trade trade : openTrades) {
+            BigDecimal currentPrice = getCurrentPrice(trade.getSymbol());
+
+            <span class="keyword">if</span> (shouldExitTrade(trade, currentPrice)) {
+                closeTrade(trade, currentPrice);
+            }
+        }
+    }
+}
+</pre>
+            </div>
+
+            <h3>Configuration Properties</h3>
+            <div class="code-block">
+<pre>
+<span class="comment"># Strategy Configuration</span>
+strategy.sudden-movement.threshold=2.0      <span class="comment"># 2% movement threshold</span>
+strategy.sudden-movement.timeframe=5         <span class="comment"># 5 minute timeframe</span>
+strategy.execution.interval=60000          <span class="comment"># Execute every minute</span>
+
+<span class="comment"># Trading Configuration</span>
+trading.paper-trading=true                  <span class="comment"># Paper trading mode</span>
+trading.default-quantity=1                  <span class="comment"># Default order quantity</span>
+trading.risk.percentage=2.0                 <span class="comment"># 2% risk per trade</span>
+</pre>
+            </div>
+        </div>
+
+        <div class="section" id="deployment">
+            <h2>🚀 Deployment Guide</h2>
+
+            <h3>Local Development Setup</h3>
+            <div class="code-block">
+<pre>
+<span class="comment"># 1. Clone the repository</span>
+git clone <repository-url>
+cd kite-algo-trading
+
+<span class="comment"># 2. Install dependencies</span>
+mvn clean install
+
+<span class="comment"># 3. Configure database</span>
+createdb kite_trading
+
+<span class="comment"># 4. Run application</span>
+mvn spring-boot:run
+
+<span class="comment"># 5. Access dashboard</span>
+open http://localhost:8080/index.html
+</pre>
+            </div>
+
+            <h3>Docker Deployment</h3>
+            <div class="code-block">
+<pre>
+<span class="comment"># Build Docker image</span>
+docker build -t kite-algo-trading:latest .
+
+<span class="comment"># Run with Docker Compose</span>
+docker-compose up -d
+
+<span class="comment"># View logs</span>
+docker-compose logs -f app
+
+<span class="comment"># Stop services</span>
+docker-compose down
+</pre>
+            </div>
+
+            <h3>Production Deployment</h3>
+            <div class="warning-box">
+                <strong>⚠️ Important Security Considerations:</strong>
+                <ul>
+                    <li>Change default security password</li>
+                    <li>Use environment variables for sensitive data</li>
+                    <li>Enable HTTPS/TLS for production</li>
+                    <li>Configure proper CORS settings</li>
+                    <li>Set up database backups</li>
+                    <li>Monitor application logs</li>
+                </ul>
+            </div>
+
+            <h3>Environment Variables</h3>
+            <div class="code-block">
+<pre>
+<span class="comment"># Database Configuration</span>
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=kite_trading
+DB_USER=postgres
+DB_PASSWORD=your_secure_password
+
+<span class="comment"># Kite Connect Configuration</span>
+KITE_API_KEY=your_api_key
+KITE_API_SECRET=your_api_secret
+
+<span class="comment"># Trading Configuration</span>
+PAPER_TRADING=false
+DEFAULT_QUANTITY=1
+RISK_PERCENTAGE=2.0
+
+<span class="comment"># Strategy Configuration</span>
+SUDDEN_MOVEMENT_THRESHOLD=2.0
+SUDDEN_MOVEMENT_TIMEFRAME=5
+STRATEGY_EXECUTION_INTERVAL=60000
+</pre>
+            </div>
+
+            <h3>Monitoring and Logging</h3>
+            <div class="success-box">
+                <strong>✅ Built-in Monitoring:</strong>
+                <ul>
+                    <li>Spring Boot Actuator endpoints</li>
+                    <li>Application health checks</li>
+                    <li>Performance metrics</li>
+                    <li>Database connection monitoring</li>
+                    <li>Strategy execution logs</li>
+                </ul>
+            </div>
+
+            <h3>Backup and Recovery</h3>
+            <div class="info-box">
+                <strong>Database Backup Commands:</strong>
+                <div class="code-block">
+<pre>
+<span class="comment"># Create backup</span>
+pg_dump -U postgres kite_trading > backup_$(date +%Y%m%d).sql
+
+<span class="comment"># Restore from backup</span>
+psql -U postgres kite_trading < backup_20240126.sql
+
+<span class="comment"># Automated backup script</span>
+0 2 * * * pg_dump -U postgres kite_trading > /backups/daily_$(date +\%Y\%m\%d).sql
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 Additional Resources</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📖 Documentation</h4>
+                    <ul>
+                        <li><a href="README.md">README.md</a> - Project overview</li>
+                        <li><a href="QUICKSTART.md">QUICKSTART.md</a> - Quick start guide</li>
+                        <li>API Documentation - Swagger/OpenAPI</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🔧 Development Tools</h4>
+                    <ul>
+                        <li>DBeaver - Database management</li>
+                        <li>PostgreSQL - Database server</li>
+                        <li>Maven - Build tool</li>
+                        <li>Git - Version control</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4>🌐 External Services</h4>
+                    <ul>
+                        <li>Kite Connect API - Trading platform</li>
+                        <li>Ngrok - Tunneling service</li>
+                        <li>Spring Boot - Application framework</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🎓 Learning Resources</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Topic</th>
+                            <th>Resources</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Spring Boot</td>
+                            <td>Spring Documentation, Baeldung Guides</td>
+                        </tr>
+                        <tr>
+                            <td>Algorithmic Trading</td>
+                            <td>QuantConnect, TradingView Education</td>
+                        </tr>
+                        <tr>
+                            <td>Technical Analysis</td>
+                            <td>Investopedia, BabyPips</td>
+                        </tr>
+                        <tr>
+                            <td>Database Design</td>
+                            <td>PostgreSQL Documentation, Database Best Practices</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>🤝 Support and Contribution</h3>
+            <div class="info-box">
+                <strong>Getting Help:</strong>
+                <ul>
+                    <li>Check existing documentation</li>
+                    <li>Review code comments</li>
+                    <li>Examine API endpoints</li>
+                    <li>Test with paper trading mode</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Application Status:</strong>
+                <ul>
+                    <li>✅ Built and compiled successfully</li>
+                    <li>✅ PostgreSQL database configured</li>
+                    <li>✅ All services running</li>
+                    <li>✅ Ngrok tunnel active</li>
+                    <li>✅ Web dashboard accessible</li>
+                    <li>✅ API endpoints operational</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">
+                <h2>🎉 Ready to Trade!</h2>
+                <p>Access your dashboard at: <strong>https://haunt-resonant-absence.ngrok-free.dev/index.html</strong></p>
+                <p style="margin-top: 10px;">Local access: <strong>http://localhost:8080/index.html</strong></p>
+            </div>
+        </div>
+
+        <footer style="text-align: center; padding: 20px; color: #666; margin-top: 30px;">
+            <p>Kite Algo Trading Application v1.0.0</p>
+            <p>Generated with ❤️ for algorithmic trading enthusiasts</p>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add copy functionality to code blocks
+        document.querySelectorAll('.code-block').forEach(block => {
+            const copyButton = document.createElement('button');
+            copyButton.textContent = '📋 Copy';
+            copyButton.style.cssFloat = 'right';
+            copyButton.style.background = '#667eea';
+            copyButton.style.color = 'white';
+            copyButton.style.border = 'none';
+            copyButton.style.padding = '5px 10px';
+            copyButton.style.borderRadius = '3px';
+            copyButton.style.cursor = 'pointer';
+            copyButton.style.marginBottom = '10px';
+
+            copyButton.addEventListener('click', () => {
+                const code = block.querySelector('pre').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    copyButton.textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        copyButton.textContent = '📋 Copy';
+                    }, 2000);
+                });
+            });
+
+            block.insertBefore(copyButton, block.firstChild);
+        });
+    </script>
+</body>
+</html>

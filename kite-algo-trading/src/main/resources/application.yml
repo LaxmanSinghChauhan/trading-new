@@ -1,0 +1,106 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: kite-algo-trading
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/kite_trading}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+kite:
+  api-key: ${KITE_API_KEY:}
+  api-secret: ${KITE_API_SECRET:}
+  api-url: ${KITE_API_URL:https://api.kite.trade}
+  ngrok-url: ${NGROK_URL:}
+  ngrok-authtoken: ${NGROK_AUTHTOKEN:}
+  callback-url: ${KITE_CALLBACK_URL:}
+  postback-url: ${KITE_POSTBACK_URL:}
+
+broker:
+  mode: ${BROKER_MODE:PAPER}
+
+admin:
+  api-key: ${ADMIN_API_KEY:change-me}
+
+telegram:
+  enabled: ${TELEGRAM_ENABLED:false}
+  bot-token: ${TELEGRAM_BOT_TOKEN:}
+  chat-id: ${TELEGRAM_CHAT_ID:}
+
+universe:
+  min-price: ${UNIVERSE_MIN_PRICE:50.0}
+  refresh-cron: ${UNIVERSE_REFRESH_CRON:0 0 8 * * MON-FRI}
+  blacklist: ${UNIVERSE_BLACKLIST:}
+  instrument-master-resource: universe/instrument_bootstrap.csv
+  nifty500-resource: universe/nifty500_symbols.txt
+  banknifty-resource: universe/banknifty_symbols.txt
+
+market:
+  hours-start: ${MARKET_HOURS_START:09:15}
+  signal-cutoff: ${MARKET_SIGNAL_CUTOFF:15:20}
+  hard-close: ${MARKET_HARD_CLOSE:15:15}
+  hard-close-cron: ${MARKET_HARD_CLOSE_CRON:0 15 15 * * MON-FRI}
+  capital-reset-cron: ${MARKET_CAPITAL_RESET_CRON:0 0 18 * * MON-FRI}
+
+report:
+  summary-time: ${REPORT_SUMMARY_TIME:15:45}
+  summary-cron: ${REPORT_SUMMARY_CRON:0 45 15 * * MON-FRI}
+
+news:
+  enabled: ${NEWS_ENABLED:false}
+  poll-interval-ms: ${NEWS_POLL_INTERVAL_MS:120000}
+  top-symbol-limit: ${NEWS_TOP_SYMBOL_LIMIT:20}
+  nse-url: ${NEWS_NSE_URL:}
+  google-rss-template: ${NEWS_GOOGLE_RSS_TEMPLATE:https://news.google.com/rss/search?q=%s+stock}
+
+tick:
+  queue:
+    capacity: ${TICK_QUEUE_CAPACITY:50000}
+
+signal:
+  queue:
+    capacity: ${SIGNAL_QUEUE_CAPACITY:1000}
+
+execution:
+  queue:
+    capacity: ${EXECUTION_QUEUE_CAPACITY:1000}
+
+trading:
+  paper-trading: ${TRADING_PAPER_TRADING:true}
+  default-quantity: ${TRADING_DEFAULT_QUANTITY:1}
+  risk:
+    percentage: ${TRADING_RISK_PERCENTAGE:2.0}
+
+logging:
+  level:
+    com.kite.trading: INFO
+    org.springframework.web: INFO
+  file:
+    name: logs/kite-algo-trading.log
+
+ratelimit:
+  limit: 35
+  period: 60000

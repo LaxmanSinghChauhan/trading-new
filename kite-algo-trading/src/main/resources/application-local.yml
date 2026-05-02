@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:kitealgo-local;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+broker:
+  mode: PAPER
+
+telegram:
+  enabled: false
+
+news:
+  enabled: false
+
+logging:
+  level:
+    com.kite.trading: INFO

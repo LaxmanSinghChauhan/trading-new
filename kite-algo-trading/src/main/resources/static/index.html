@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kite Momentum Control Room</title>
+    <style>
+        :root {
+            --bg: #f5efe4;
+            --ink: #182321;
+            --muted: #61706b;
+            --panel: rgba(255, 252, 246, 0.88);
+            --panel-strong: #fffaf0;
+            --line: rgba(24, 35, 33, 0.08);
+            --accent: #0f766e;
+            --accent-soft: rgba(15, 118, 110, 0.12);
+            --warn: #b45309;
+            --danger: #b42318;
+            --good: #15803d;
+            --shadow: 0 24px 70px rgba(36, 34, 25, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 30%),
+                radial-gradient(circle at top right, rgba(180, 83, 9, 0.18), transparent 26%),
+                linear-gradient(160deg, #f9f3e8 0%, #f0eadf 40%, #ebe5db 100%);
+            padding: 28px;
+        }
+
+        .shell {
+            max-width: 1480px;
+            margin: 0 auto;
+            display: grid;
+            gap: 22px;
+        }
+
+        .hero,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            animation: rise 500ms ease both;
+        }
+
+        .hero {
+            padding: 28px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.68);
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .pulse {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--good);
+            box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.4);
+            animation: pulse 1.8s infinite;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 4rem);
+            line-height: 0.95;
+            letter-spacing: -0.05em;
+            margin-top: 18px;
+            max-width: 800px;
+        }
+
+        .hero-copy {
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 760px;
+            line-height: 1.6;
+        }
+
+        .hero-side {
+            display: grid;
+            gap: 12px;
+            min-width: 320px;
+        }
+
+        .clock,
+        .status-stack {
+            background: var(--panel-strong);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 18px;
+        }
+
+        .clock-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        .clock-label {
+            color: var(--muted);
+            margin-top: 6px;
+            font-size: 0.88rem;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .status-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .status-label {
+            color: var(--muted);
+        }
+
+        .status-value {
+            font-weight: 700;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 18px;
+            min-height: 120px;
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 12px;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+        }
+
+        .metric-sub {
+            color: var(--muted);
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 22px;
+        }
+
+        .column {
+            display: grid;
+            gap: 22px;
+        }
+
+        .panel {
+            padding: 22px;
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .panel-note {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .grid-two {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .grid-three {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.92rem;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .chip.warn {
+            background: rgba(180, 83, 9, 0.12);
+            color: var(--warn);
+        }
+
+        .chip.danger {
+            background: rgba(180, 35, 24, 0.12);
+            color: var(--danger);
+        }
+
+        .chip.good {
+            background: rgba(21, 128, 61, 0.12);
+            color: var(--good);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button,
+        .button-link {
+            border: none;
+            border-radius: 14px;
+            padding: 11px 16px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.92rem;
+            transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+        }
+
+        button:hover,
+        .button-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(24, 35, 33, 0.08);
+        }
+
+        .primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .secondary {
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--ink);
+            border: 1px solid var(--line);
+        }
+
+        .danger-btn {
+            background: var(--danger);
+            color: white;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.82rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 12px 14px;
+            font: inherit;
+            background: rgba(255, 255, 255, 0.82);
+            color: var(--ink);
+        }
+
+        textarea {
+            min-height: 96px;
+            resize: vertical;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .config-item {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.74);
+            padding: 14px;
+        }
+
+        .config-key {
+            color: var(--muted);
+            font-size: 0.76rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .config-value {
+            margin-top: 8px;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 22px 0 8px;
+        }
+
+        .banner {
+            padding: 12px 14px;
+            border-radius: 16px;
+            font-size: 0.92rem;
+            background: rgba(15, 118, 110, 0.1);
+            color: var(--accent);
+            display: none;
+        }
+
+        .banner.show {
+            display: block;
+        }
+
+        .mono {
+            font-family: "SFMono-Regular", "JetBrains Mono", Consolas, monospace;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 12px rgba(21, 128, 61, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(21, 128, 61, 0);
+            }
+        }
+
+        @media (max-width: 1080px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .split,
+            .grid-two,
+            .grid-three {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .hero,
+            .panel {
+                border-radius: 20px;
+                padding: 18px;
+            }
+
+            .metric-value {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <section class="hero">
+        <div class="hero-top">
+            <div>
+                <div class="eyebrow"><span class="pulse"></span> Intraday Momentum Control Room</div>
+                <h1>Paper-to-live operator cockpit for the Zerodha momentum stack.</h1>
+                <p class="hero-copy">
+                    This dashboard keeps the original auth and portfolio visibility, but now layers in the v1 trading runtime:
+                    health, signal flow, risk gates, positions, news, runtime config, and admin control actions.
+                </p>
+            </div>
+            <div class="hero-side">
+                <div class="clock">
+                    <div class="clock-value" id="clockValue">--:--:--</div>
+                    <div class="clock-label" id="clockLabel">Asia/Kolkata</div>
+                </div>
+                <div class="status-stack">
+                    <div class="status-row"><span class="status-label">Broker mode</span><span class="status-value" id="brokerMode">--</span></div>
+                    <div class="status-row"><span class="status-label">Trading switch</span><span class="status-value" id="tradingSwitch">--</span></div>
+                    <div class="status-row"><span class="status-label">Kite auth</span><span class="status-value" id="kiteAuthStatus">--</span></div>
+                    <div class="status-row"><span class="status-label">Universe size</span><span class="status-value" id="universeSize">--</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-label">Health</div>
+                <div class="metric-value" id="healthStatus">--</div>
+                <div class="metric-sub" id="healthMeta">Queues idle</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Open Positions</div>
+                <div class="metric-value" id="openPositionsMetric">0</div>
+                <div class="metric-sub" id="capitalMetric">Capital available --</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Signals</div>
+                <div class="metric-value" id="signalMetric">0</div>
+                <div class="metric-sub" id="signalMeta">No recent detections</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Market Breaker</div>
+                <div class="metric-value" id="marketBreakerMetric">0%</div>
+                <div class="metric-sub" id="marketBreakerMeta">Nifty drawdown tracker</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">PnL</div>
+                <div class="metric-value" id="pnlMetric">Rs 0.00</div>
+                <div class="metric-sub" id="pnlMeta">Realized daily PnL</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Portfolio Snapshot</div>
+                <div class="metric-value" id="portfolioMetric">--</div>
+                <div class="metric-sub" id="portfolioMeta">Available margin</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="layout">
+        <div class="column">
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">Signals and Positions</div>
+                        <div class="panel-note">Live signal trail, active positions, and the latest lifecycle events.</div>
+                    </div>
+                    <div class="chip good" id="queueChip">Pipelines healthy</div>
+                </div>
+                <div class="split">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Recent Signal</th>
+                                <th>Strength</th>
+                                <th>Price Change</th>
+                                <th>Volume</th>
+                            </tr>
+                            </thead>
+                            <tbody id="signalsBody">
+                            <tr><td colspan="4" class="empty">Waiting for signals.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Qty</th>
+                                <th>Last</th>
+                                <th>Unrealized</th>
+                            </tr>
+                            </thead>
+                            <tbody id="positionsBody">
+                            <tr><td colspan="4" class="empty">No open positions.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">Portfolio and Broker Session</div>
+                        <div class="panel-note">Keeps the original Kite auth flow available while the paper-trading core evolves.</div>
+                    </div>
+                    <div class="actions">
+                        <button class="primary" id="loginBtn">Connect Kite</button>
+                        <button class="secondary" id="refreshPortfolioBtn">Refresh Portfolio</button>
+                        <button class="danger-btn" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+                <div class="banner" id="authBanner"></div>
+                <div class="grid-three" id="portfolioGrid">
+                    <div class="config-item">
+                        <div class="config-key">Available Cash</div>
+                        <div class="config-value" id="portfolioCash">--</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-key">Utilised Margin</div>
+                        <div class="config-value" id="portfolioUtilised">--</div>
+                    </div>
+                    <div class="config-item">
+                        <div class="config-key">Net Margin</div>
+                        <div class="config-value" id="portfolioNet">--</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">Trade History</div>
+                        <div class="panel-note">Lifecycle-level `trade_log` view with entry and exit outcomes.</div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Status</th>
+                            <th>Entry</th>
+                            <th>Exit</th>
+                            <th>Net PnL</th>
+                            <th>Reason</th>
+                        </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                        <tr><td colspan="6" class="empty">No trades recorded yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div class="column">
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">Admin Key and Controls</div>
+                        <div class="panel-note">Admin routes use the `X-Admin-Key` header defined in backend config.</div>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="adminKey">Admin API Key</label>
+                        <input id="adminKey" placeholder="Enter your X-Admin-Key">
+                    </div>
+                    <div class="actions">
+                        <button class="secondary" id="loadAdminBtn">Load Admin State</button>
+                        <button class="secondary" id="pauseTradingBtn">Pause Trading</button>
+                        <button class="secondary" id="resumeTradingBtn">Resume Trading</button>
+                        <button class="danger-btn" id="exitAllBtn">Exit All</button>
+                    </div>
+                    <div class="banner" id="adminBanner"></div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">Broker Mode</div>
+                        <div class="panel-note">Visible mode selector for `PAPER` and `LIVE`. Runtime switching stays blocked on purpose.</div>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="actions">
+                        <button class="secondary" id="paperModeBtn">PAPER</button>
+                        <button class="secondary" id="liveModeBtn">LIVE</button>
+                    </div>
+                    <div class="banner" id="brokerModeBanner"></div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">Runtime Configuration</div>
+                        <div class="panel-note">The in-database `system_config` keys that drive thresholds and controls.</div>
+                    </div>
+                </div>
+                <div class="config-grid" id="configGrid">
+                    <div class="empty">Load admin state to inspect runtime config.</div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">Tick Simulation</div>
+                        <div class="panel-note">Useful in paper mode before WebSocket wiring is fully live.</div>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="grid-two">
+                        <div class="field">
+                            <label for="tickToken">Instrument Token</label>
+                            <input id="tickToken" value="1001">
+                        </div>
+                        <div class="field">
+                            <label for="tickSymbol">Symbol</label>
+                            <input id="tickSymbol" value="RELIANCE">
+                        </div>
+                    </div>
+                    <div class="grid-two">
+                        <div class="field">
+                            <label for="tickPrice">Last Price</label>
+                            <input id="tickPrice" value="100.60">
+                        </div>
+                        <div class="field">
+                            <label for="tickVolume">Volume</label>
+                            <input id="tickVolume" value="1000">
+                        </div>
+                    </div>
+                    <button class="primary" id="sendTickBtn">Send Simulated Tick</button>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <div class="panel-title">News and Universe</div>
+                        <div class="panel-note">Recent advisory news plus current universe and blacklist state.</div>
+                    </div>
+                </div>
+                <div class="grid-two">
+                    <div>
+                        <div class="chip">Recent News</div>
+                        <div id="newsList" class="empty">No news loaded.</div>
+                    </div>
+                    <div>
+                        <div class="chip">Universe Snapshot</div>
+                        <div id="universeList" class="empty">Loading universe...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script>
+    const state = {
+        adminKey: localStorage.getItem("kite-admin-key") || "",
+        authStatus: null
+    };
+
+    const el = (id) => document.getElementById(id);
+
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined || value === "") return "--";
+        const number = Number(value);
+        if (Number.isNaN(number)) return value;
+        return new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 2
+        }).format(number);
+    };
+
+    const formatPercent = (value) => {
+        if (value === null || value === undefined || value === "") return "--";
+        const number = Number(value);
+        if (Number.isNaN(number)) return value;
+        return `${number.toFixed(2)}%`;
+    };
+
+    const formatTime = (value) => value ? new Date(value).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short"
+    }) : "--";
+
+    async function api(path, options = {}) {
+        const response = await fetch(path, options);
+        const contentType = response.headers.get("content-type") || "";
+        const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+        if (!response.ok) {
+            const message = typeof payload === "string" ? payload : payload.error || JSON.stringify(payload);
+            throw new Error(message);
+        }
+        return payload;
+    }
+
+    async function loadHealth() {
+        const health = await api("/api/health");
+        el("healthStatus").textContent = health.status;
+        el("healthMeta").textContent = `Tick queue ${health.tickQueueDepth}, execution queue ${health.executionQueueDepth}`;
+        el("brokerMode").textContent = health.brokerMode;
+        el("tradingSwitch").textContent = health.tradingEnabled ? "ENABLED" : "PAUSED";
+        el("universeSize").textContent = health.activeUniverseSize ?? "--";
+        el("queueChip").textContent = health.tickQueueDepth > 0 || health.executionQueueDepth > 0
+            ? "Pipelines active"
+            : "Pipelines healthy";
+    }
+
+    async function loadAuth() {
+        try {
+            const auth = await api("/api/auth/status");
+            state.authStatus = auth;
+            el("kiteAuthStatus").textContent = auth.authenticated ? "CONNECTED" : "DISCONNECTED";
+            showBanner("authBanner", auth.authenticated
+                ? `Authenticated${auth.user_name ? ` as ${auth.user_name}` : ""}.`
+                : "Kite session is not connected yet.", auth.authenticated ? "good" : "warn");
+        } catch (error) {
+            el("kiteAuthStatus").textContent = "UNKNOWN";
+            showBanner("authBanner", error.message, "danger");
+        }
+    }
+
+    async function loadPortfolio() {
+        try {
+            const portfolio = await api("/api/user/portfolio");
+            const equity = portfolio?.data?.equity || {};
+            el("portfolioCash").textContent = formatCurrency(equity.available?.cash);
+            el("portfolioUtilised").textContent = formatCurrency(equity.utilised?.debits);
+            el("portfolioNet").textContent = formatCurrency(equity.net);
+            el("portfolioMetric").textContent = formatCurrency(equity.net);
+            el("portfolioMeta").textContent = `Cash ${formatCurrency(equity.available?.cash)}`;
+        } catch (error) {
+            el("portfolioCash").textContent = "--";
+            el("portfolioUtilised").textContent = "--";
+            el("portfolioNet").textContent = "--";
+            el("portfolioMetric").textContent = "--";
+            el("portfolioMeta").textContent = "Authenticate to see broker portfolio.";
+        }
+    }
+
+    async function loadSignals() {
+        const [recent, stats] = await Promise.all([
+            api("/api/signals/recent"),
+            api("/api/signals/stats")
+        ]);
+
+        el("signalMetric").textContent = stats.totalSignals ?? 0;
+        el("signalMeta").textContent = stats.lastSignalAt ? `Last signal ${formatTime(stats.lastSignalAt)}` : "No recent detections";
+
+        const body = el("signalsBody");
+        if (!recent.length) {
+            body.innerHTML = `<tr><td colspan="4" class="empty">Waiting for signals.</td></tr>`;
+            return;
+        }
+
+        body.innerHTML = recent.map(signal => `
+            <tr>
+                <td><strong>${signal.symbol}</strong><br><span class="mono">${formatTime(signal.detectedAt)}</span></td>
+                <td>${signal.strength}</td>
+                <td>${formatPercent(signal.priceChangePct)}</td>
+                <td>${signal.volumeMultiplier?.toFixed ? signal.volumeMultiplier.toFixed(2) : signal.volumeMultiplier}x</td>
+            </tr>
+        `).join("");
+    }
+
+    async function loadPositions() {
+        const positions = await api("/api/positions");
+        const body = el("positionsBody");
+        el("openPositionsMetric").textContent = positions.length;
+        if (!positions.length) {
+            body.innerHTML = `<tr><td colspan="4" class="empty">No open positions.</td></tr>`;
+            return;
+        }
+
+        body.innerHTML = positions.map(position => `
+            <tr>
+                <td><strong>${position.symbol}</strong><br><span class="mono">${position.instrumentToken}</span></td>
+                <td>${position.remainingQuantity}/${position.totalQuantity}</td>
+                <td>${formatCurrency(position.lastPrice)}</td>
+                <td>${formatCurrency(position.unrealizedPnl)}</td>
+            </tr>
+        `).join("");
+    }
+
+    async function loadTradeHistory() {
+        const history = await api("/api/positions/history");
+        const body = el("historyBody");
+        if (!history.length) {
+            body.innerHTML = `<tr><td colspan="6" class="empty">No trades recorded yet.</td></tr>`;
+            return;
+        }
+
+        body.innerHTML = history.map(row => `
+            <tr>
+                <td><strong>${row.trade.symbol}</strong></td>
+                <td>${row.trade.status}</td>
+                <td>${formatCurrency(row.trade.entryPriceVwap)}</td>
+                <td>${formatCurrency(row.trade.exitPriceVwap)}</td>
+                <td>${formatCurrency(row.trade.netPnl)}</td>
+                <td>${row.trade.finalExitReason || "--"}</td>
+            </tr>
+        `).join("");
+    }
+
+    async function loadRisk() {
+        const risk = await api("/api/risk/status");
+        el("capitalMetric").textContent = `Capital available ${formatCurrency(risk.availableCapital)}`;
+        el("marketBreakerMetric").textContent = formatPercent(risk.marketDropPct);
+        el("marketBreakerMeta").textContent = risk.marketBreakerActive ? "Market breaker active" : "Market breaker clear";
+        el("pnlMetric").textContent = formatCurrency(risk.realizedPnl);
+        el("pnlMeta").textContent = risk.dailyLossBreakerActive ? "Daily loss breaker active" : "Daily risk normal";
+    }
+
+    async function loadUniverse() {
+        const universe = await api("/api/universe");
+        const active = universe.active || [];
+        const blacklist = universe.blacklist || [];
+        el("universeList").innerHTML = `
+            <p>${active.length} active instruments</p>
+            <p class="mono" style="margin-top:8px">${active.slice(0, 10).map(item => item.symbol).join(", ") || "--"}</p>
+            <p style="margin-top:10px;color:var(--muted)">Blacklist: ${blacklist.length ? blacklist.join(", ") : "None"}</p>
+        `;
+    }
+
+    async function loadAdmin() {
+        const key = el("adminKey").value.trim();
+        if (!key) {
+            showBanner("adminBanner", "Enter the admin key before loading admin state.", "warn");
+            return;
+        }
+        state.adminKey = key;
+        localStorage.setItem("kite-admin-key", key);
+
+        const dashboard = await api("/api/admin/dashboard", {
+            headers: {
+                "X-Admin-Key": key
+            }
+        });
+        const brokerMode = await api("/api/admin/broker-mode", {
+            headers: {
+                "X-Admin-Key": key
+            }
+        });
+
+        const configEntries = Object.entries(dashboard.config || {});
+        el("configGrid").innerHTML = configEntries.length
+            ? configEntries.map(([configKey, value]) => `
+                <div class="config-item">
+                    <div class="config-key">${configKey.replaceAll("_", " ")}</div>
+                    <div class="config-value">${value}</div>
+                </div>
+            `).join("")
+            : `<div class="empty">No runtime config found.</div>`;
+
+        const newsItems = dashboard.latestNews || [];
+        el("newsList").innerHTML = newsItems.length
+            ? newsItems.slice(0, 6).map(item => `
+                <div class="config-item" style="margin-bottom:10px">
+                    <div class="config-key">${item.source} ${item.symbol ? `- ${item.symbol}` : ""}</div>
+                    <div class="config-value" style="font-size:0.98rem">${item.headline}</div>
+                    <div class="panel-note" style="margin-top:8px">${item.sentiment} • ${formatTime(item.processedAt)}</div>
+                </div>
+            `).join("")
+            : `<div class="empty">No recent news logs.</div>`;
+
+        showBanner("adminBanner", "Admin state loaded.", "good");
+        showBanner("brokerModeBanner", `${brokerMode.activeMode} is active. ${brokerMode.message}`, "warn");
+        syncBrokerModeButtons(brokerMode.activeMode);
+    }
+
+    async function adminAction(path, message) {
+        const key = el("adminKey").value.trim();
+        if (!key) {
+            showBanner("adminBanner", "Enter the admin key first.", "warn");
+            return;
+        }
+        await api(path, {
+            method: "POST",
+            headers: {
+                "X-Admin-Key": key
+            }
+        });
+        showBanner("adminBanner", message, "good");
+        await refreshAll();
+    }
+
+    async function sendTick() {
+        const key = el("adminKey").value.trim();
+        if (!key) {
+            showBanner("adminBanner", "Enter the admin key first.", "warn");
+            return;
+        }
+        await api("/api/admin/ticks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Admin-Key": key
+            },
+            body: JSON.stringify({
+                instrumentToken: Number(el("tickToken").value),
+                symbol: el("tickSymbol").value,
+                lastPrice: Number(el("tickPrice").value),
+                volume: Number(el("tickVolume").value)
+            })
+        });
+        showBanner("adminBanner", "Simulated tick accepted.", "good");
+        await refreshAll();
+    }
+
+    async function requestBrokerMode(mode) {
+        const key = el("adminKey").value.trim();
+        if (!key) {
+            showBanner("brokerModeBanner", "Enter the admin key first.", "warn");
+            return;
+        }
+        try {
+            await api("/api/admin/broker-mode", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Key": key
+                },
+                body: JSON.stringify({ mode })
+            });
+        } catch (error) {
+            showBanner("brokerModeBanner", error.message, "warn");
+            syncBrokerModeButtons(mode === "PAPER" ? "PAPER" : "LIVE", false);
+            return;
+        }
+    }
+
+    async function login() {
+        const payload = await api("/api/auth/login-url");
+        if (!payload.login_url) {
+            showBanner("authBanner", "Unable to generate login URL.", "danger");
+            return;
+        }
+        window.location.href = payload.login_url;
+    }
+
+    async function logout() {
+        await api("/api/auth/logout", { method: "POST" });
+        showBanner("authBanner", "Logged out of Kite session.", "good");
+        await refreshAll();
+    }
+
+    function showBanner(id, text, tone) {
+        const banner = el(id);
+        banner.textContent = text;
+        banner.className = `banner show`;
+        if (tone === "danger") banner.style.background = "rgba(180, 35, 24, 0.12)", banner.style.color = "var(--danger)";
+        else if (tone === "warn") banner.style.background = "rgba(180, 83, 9, 0.12)", banner.style.color = "var(--warn)";
+        else banner.style.background = "rgba(15, 118, 110, 0.1)", banner.style.color = "var(--accent)";
+    }
+
+    function syncBrokerModeButtons(activeMode) {
+        const paperBtn = el("paperModeBtn");
+        const liveBtn = el("liveModeBtn");
+        paperBtn.className = activeMode === "PAPER" ? "primary" : "secondary";
+        liveBtn.className = activeMode === "LIVE" ? "primary" : "secondary";
+    }
+
+    function startClock() {
+        const tick = () => {
+            const now = new Date();
+            el("clockValue").textContent = now.toLocaleTimeString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                hour12: false
+            });
+            el("clockLabel").textContent = now.toLocaleDateString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                weekday: "long",
+                month: "long",
+                day: "numeric"
+            }) + " • Asia/Kolkata";
+        };
+        tick();
+        setInterval(tick, 1000);
+    }
+
+    async function refreshAll() {
+        await Promise.allSettled([
+            loadHealth(),
+            loadAuth(),
+            loadPortfolio(),
+            loadSignals(),
+            loadPositions(),
+            loadTradeHistory(),
+            loadRisk(),
+            loadUniverse()
+        ]);
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        el("adminKey").value = state.adminKey;
+        startClock();
+
+        el("loginBtn").addEventListener("click", login);
+        el("logoutBtn").addEventListener("click", logout);
+        el("refreshPortfolioBtn").addEventListener("click", loadPortfolio);
+        el("loadAdminBtn").addEventListener("click", loadAdmin);
+        el("pauseTradingBtn").addEventListener("click", () => adminAction("/api/admin/trading/pause", "Trading paused."));
+        el("resumeTradingBtn").addEventListener("click", () => adminAction("/api/admin/trading/resume", "Trading resumed."));
+        el("exitAllBtn").addEventListener("click", () => adminAction("/api/admin/exit-all", "Exit-all triggered."));
+        el("sendTickBtn").addEventListener("click", sendTick);
+        el("paperModeBtn").addEventListener("click", () => requestBrokerMode("PAPER"));
+        el("liveModeBtn").addEventListener("click", () => requestBrokerMode("LIVE"));
+
+        await refreshAll();
+        if (state.adminKey) {
+            await loadAdmin().catch(() => {});
+        }
+        setInterval(refreshAll, 10000);
+    });
+</script>
+</body>
+</html>
