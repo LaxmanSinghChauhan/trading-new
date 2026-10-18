@@ -1,0 +1,23 @@
+{
+  "skill_name": "indian-train-search",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Ganj Basoda (BAQ) se Hazrat Nizamuddin (NZM) ki trains dhoondho 10 se 15 Nov 2026 ke liye. BAQ se departure 18:00 se 01:00 (02:00 tak theek), train NZM pe END honi chahiye. Main BAQ se board karunga par Bhopal, Rani Kamlapati, Vidisha, Itarsi, Jabalpur se bhi ticket dekho. Raat 12 ke baad BAQ aane wali train pichhle din ki ginna. Output Hinglish table: Train | Kahan se book karna hai | BAQ time | NZM arrival | SL / 3A / 2A, phir Best option 3 line mein, phir jo verify nahi hua. Booking/login mat karna, sawal mat poochna.",
+      "expected_output": "Per-night Hinglish tables for 10-15 Nov with 12721, 12405 (Tue/Sun) or 12409 (other days), 12155, 12192 (BAQ 01:05 counted for the previous night); trains not ending at NZM excluded; upstream booking advice (e.g. Itarsi for 12192, Bhopal/RKMP for 12155 SL) with ticket dates and boarding point; 3-line best option; unverified list.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I need a 3A berth from Vidisha (BHS) to New Delhi (NDLS) on the night of 5 Dec 2026, any train leaving after 8pm. Check whether buying the ticket from Bhopal or Itarsi and boarding at Vidisha gets a better status. Don't book anything.",
+      "expected_output": "English table of trains BHS->NDLS departing 20:00 onwards on 5 Dec (incl. after-midnight ones with correct ticket dates), 3A status from BHS vs BPL/ET/origin, clear recommendation with fare difference and boarding-point instruction, caveats.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "kota se mumbai central 20-22 dec 2026 raat ki koi train batao SL aur 3A me, kota se pehle wale station (sawai madhopur, gangapur city) se ticket lene ka fayda ho to wo bhi batao",
+      "expected_output": "Hinglish per-night tables KOTA->MMCT/BCT for 20-22 Dec night window, SL and 3A, with SWM/GGC (and origin) compared via pools; best option and unverified list.",
+      "files": []
+    }
+  ]
+}
