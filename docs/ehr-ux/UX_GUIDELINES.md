@@ -137,6 +137,21 @@ Why these five hues: neutral, blue, amber, green and red differ in **lightness**
 
 Status tints in dark mode: same hues at roughly 18% opacity over the surface, with text from the 300–200 range of the same hue. Always re-check contrast.
 
+### 2.6 Theme options (user-selectable, top bar)
+
+The user picks an accent shade from a **Theme** menu in the top bar. Themes only change the accent family, the donut ramp and (for Midnight) the surfaces. **Status colors never change between themes**, so "Arrived" always means the same thing.
+
+| Theme | Accent (white text) | Soft bg / text on soft | Donut ramp (dark → light) | Notes |
+|---|---|---|---|---|
+| **Ocean** (default) | `#1F5BD1` (6.0:1) | `#E8EFFC` / `#1A3F8F` | `#1A3F8F` `#5B85DC` `#9DB8EE` | Calm clinical blue |
+| **Lagoon** | `#0E7490` (5.4:1) | `#E0F2F7` / `#0A5468` | `#0A5468` `#1E91B0` `#74BFD6` | Fresh teal |
+| **Indigo** | `#4F46E5` (6.3:1) | `#EEF0FF` / `#3730A3` | `#3730A3` `#6D66EE` `#A9ADF5` | Modern violet-blue |
+| **Plum** | `#8A3EA6` (6.3:1) | `#F6ECFA` / `#6A2C82` | `#6A2C82` `#A65DC2` `#D3A6E3` | Soft and warm |
+| **Terracotta** | `#B9520B` (4.9:1) | `#FDEEE3` / `#8A3B06` | `#8A3B06` `#C9661F` `#E9A064` | Warm. Sits near "Arrived" amber, so keep the status icon and word visible |
+| **Midnight** (dark) | `#7AA7FF` (dark text, 7.8:1) | `#1F3256` / `#A9C4FF` | `#A9C4FF` `#6F93D8` `#36558A` | Uses the dark surface and status tokens from §2.5 |
+
+The lightest donut step clears 2:1 against its surface in every theme.
+
 ---
 
 ## 3. Typography
@@ -263,7 +278,8 @@ This is the most important control in the product.
 
 | View | Columns / rows | Default for | Notes |
 |---|---|---|---|
-| **Day · by provider** (resource time grid) | One column per provider, time down the side | Front desk | The default. Up to ~6 providers before horizontal scroll; then use filters. |
+| **Day · by provider** (resource time grid) | One column per provider, time down the side | Front desk | Up to ~6 providers before horizontal scroll; then use filters. |
+| **Day · timeline** (chosen in prototype Q) | Providers (and optionally rooms) as rows, time across 8 AM–6 PM, now pill, Detail/Compact zoom | Front desk default | Scales to many providers: a **provider picker** (search, grouped by specialty, quick sets like "My usual 3") shows **2–4 at a time**. A provider chosen in a booking is added automatically. |
 | **Week · one provider** | 5 or 7 day columns | Booking follow-ups for a specific provider | Provider picker in the header |
 | **Timeline** (resource timeline) | Providers as rows, time across | Large clinics (> 6 providers), rooms and equipment | Best for spotting gaps across many resources |
 | **List / agenda** | Rows grouped by time | Phones, tablets, check-in, accessibility | Always available; the screen-reader-first view |
@@ -350,6 +366,18 @@ These are **solid blocks with white text**, in the style of Bryntum and DevExpre
 ---
 
 ## 8. Booking flow (replaces the 5-step wizard)
+
+**Chosen pattern (working prototype Q):** a booking card opens above the schedule, and the schedule stays visible below it. The card has:
+
+- An accent band naming the task ("New appointment for Test, Aarav · 12 y · DOB …") so the section change is obvious.
+- A **progress meter ring** showing % complete and "2 of 5 done".
+- **Five step tiles joined by arrows**: Patient → Visit → Time → Insurance → Review. Each tile shows its number or a ✓, a title, and the value chosen so far. Done tiles are filled with the soft accent, the current tile has an accent outline, and steps not yet reached are locked.
+- The form for the current step on the left, a **booking summary** on the right, and Back / Continue in the footer.
+- At the Time step, the chosen provider's open times are highlighted in the schedule below and can be clicked directly.
+
+Today-at-a-glance collapses to a one-line strip while booking.
+
+The rules below still apply to what goes inside each step:
 
 One context panel, **one progressive form**, four sections. A completed section collapses to a one-line summary with "Change".
 

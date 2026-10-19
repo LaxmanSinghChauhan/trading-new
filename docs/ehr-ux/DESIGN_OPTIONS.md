@@ -56,3 +56,27 @@ So Round 2 follows the new clickability rule (P15 in USABILITY_PRINCIPLES.md, §
 |---|---|---|---|
 | **O · Front Desk Dashboard** | Booking-dashboard reference: warm orange accent, soft rounded cards, tab nav, donut of today's appointments (still to come / here now / checked out), "waiting longest" callout, sortable appointments table with avatars, rooms panel with soft blocks | A morning-to-evening home screen for the front desk lead | The orange accent sits close to the amber "Arrived" color. If chosen, move Arrived to a different hue or tone the accent down. A donut is an at-a-glance summary only; numbers are always printed beside it |
 | **P · Work Week** | Syncfusion reference: Today button, ‹ › date range, provider dropdown, view dropdown (Day / Week / Work Week / Month / Timeline), "All day" row, light grid, soft pastel blocks with stripe + visit-type icon, repeating lunch, red now line | Booking within one provider's week with many short visits | Colors show visit type, so status is only a corner icon; less glanceable for day-of status work (pair with N or J) |
+
+---
+
+## Chosen direction: Q · Working prototype
+
+The reviewer picked one element from each round:
+
+| Pick | Source | In the prototype |
+|---|---|---|
+| Progress flow with arrows + progress status | V2 step tiles + circular percentage meters | Booking card: % ring + 5 tiles joined by arrows (done ✓ / current / locked) + live summary |
+| Sidebar with icons | Option A rail | Icon + label rail with a tinted active item |
+| Calendar | Option D timeline | Providers (+ rooms) as rows, time across, now pill, Timeline/List, Detail/Compact zoom |
+| Today at a glance | Option O donut | Live donut (still to come / here now / checked out), waiting-longest with "Room patient", counts for not confirmed / open times / no-shows |
+| Scale + themes | Reviewer brief | 10 providers + 2 rooms in a searchable picker (show 2–4), 30 patients, 18 days of data; Theme menu with 6 shades (Ocean, Lagoon, Indigo, Plum, Terracotta, Midnight) |
+
+The canvas opens on the **"Working prototype"** page; press Play on artboard Q. Everything on the Schedule screen works:
+
+- Search and pick a patient. Duplicates are flagged, and you can register a new patient with validation.
+- Choose the visit type and provider, then pick a time from the suggestions or click an open slot in the timeline.
+- Insurance eligibility is checked (simulated). Book the appointment, then Undo it if needed.
+- Confirm → check in → room → check out an appointment, mark a no-show, cancel, reschedule, or rebook a no-show.
+- Use global search to start a booking, switch themes, choose providers, and move between days. Weekends show as closed.
+
+The other sidebar pages are placeholders. The demo clock is fixed at Mon, Oct 19, 2026, 10:05 AM.
