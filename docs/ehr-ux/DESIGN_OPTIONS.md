@@ -24,3 +24,28 @@ All of them use the same scenario: Monday, Oct 19 at 10:05 AM. Front desk is reb
 | **G · Today Flow Board** | Status lanes: Coming up → Arrived → In room → Done, with wait timers and open times for walk-ins | Day-of operations: check-in, rooming, waits | Not a booking tool on its own; pairs with A, B or C |
 
 **Combining options:** these are meant to be mixed. A common product shape is **A (or B) for Schedule + G for Today's flow + F inside the patient chart**, with E's dark theme and command palette available as settings.
+
+---
+
+## Round 2: new metaphors + reviewer references (H–N)
+
+These are on the canvas page **"Round 2 · New directions"**; Round 1 moved to its own page.
+
+The reviewer's feedback on Round 1:
+
+- "Still basic and similar to V1/V2"
+- "Everything looks like a button, even labels"
+
+So Round 2 follows the new clickability rule (P15 in USABILITY_PRINCIPLES.md, §5.0 in UX_GUIDELINES.md): only actions look like buttons, status is a glyph + word, and choices are radio rows, selects or segmented controls. L–N take their visual language from the reviewer's references: the Bryntum timeline and the DevExpress week view.
+
+| Option | Metaphor | Best for | Main trade-off |
+|---|---|---|---|
+| **H · Day Sheet** | Printed appointment book: serif date masthead, ruled time lines, entries written in, "pencilled in" tentative booking, booking slip on the side | Calm, very readable day view; staff who think in paper books | Less visual punch; no block shapes to scan |
+| **I · Sentence Booker** | Booking is one editable sentence: "Book *Test, Aarav* for an *asthma follow-up* with *Dr. Mann* *today at 11:00 AM*", with a day ruler for picking the time | Fast phone booking, new staff, zero training | One booking at a time; needs a separate schedule view. Mad-libs forms showed a 25–40% lift in one older A/B test, so test it with our users |
+| **J · Arrivals Board** | Airport/railway board: dark, large type, Needs attention → Here now → Next hour → Later | Glanceable from across the room; wall display for MAs; check-in desk | Not for booking ahead; dark theme everywhere may not suit all clinics |
+| **K · Clinic Floor Plan** | Live map of the clinic: exam rooms with occupant and timer, waiting room with draggable patient tokens, arrivals list | Rooming and patient flow; sees room cleaning state | Each clinic needs its plan configured; not a scheduling tool on its own |
+| **L · Capacity Timeline** *(Bryntum-inspired)* | Providers and rooms as rows with avatars, 14 days across, open-slot counts per cell, solid bars for absences and reserved blocks, totals row, selection + popover with times | Booking follow-ups weeks ahead; seeing capacity and absences at a glance | Day-level only; you open a day to see individual appointments |
+| **M · Week Planner** *(DevExpress-inspired)* | Quiet week grid, big day numbers, solid colored blocks with white text, provider toggles, booking popover on the selected slot; tweak to color by status or by visit type | Booking for one provider across a week | One or two providers at a time; many providers get crowded |
+| **N · Day Scheduler** *(both references)* | Day view by provider with avatar headers, solid status blocks, hatched lunch and admin time, now line, totals row, and an appointment popover with the next action ("Room patient · Exam 1 is ready") | Front desk "home" screen: see the day and act on it | Dense on small screens; needs the List view as its mobile fallback |
+
+**Suggested combination:** **N** as the Schedule home, **M** for booking within a provider's week, **L** for long-range capacity, plus **J** or **K** as the day-of flow screen. They share the same tokens, so they can live in one product.

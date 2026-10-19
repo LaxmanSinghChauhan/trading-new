@@ -63,8 +63,13 @@ This is the playbook for every EHR screen we design and build from now on. It tu
 1. **Neutral shell.** Backgrounds, surfaces, borders and text are cool grays.
 2. **One accent** (blue) for interactive elements only: primary buttons, links, selected states, focus ring, the "now" line.
 3. **Semantic colors only for status and alerts.** Five families, always paired with an **icon and a word**.
-4. **Never** color-code two dimensions on one element (for example, status and visit type). Visit type is text.
+4. **Never** color-code two dimensions on one element (for example, status and visit type). Pick one per view. Status is the default; "color by visit type" is an allowed user setting (§6.4). Whichever is not colored is written as text or shown as an icon.
 5. Every pairing meets WCAG: text ≥ 4.5:1, borders and icons ≥ 3:1. Values below were measured.
+6. Status color appears in **only two forms**:
+   - as the **color of a glyph + word** (lists, panels, popovers)
+   - as the **solid fill of a calendar block**, which is clickable
+
+   **Never** as a pill, badge or tinted box around a label. Pills make labels look like buttons (see §5.0).
 
 ### 2.2 Neutral and accent tokens (light theme)
 
@@ -85,26 +90,38 @@ This is the playbook for every EHR screen we design and build from now on. It tu
 
 ### 2.3 Appointment status tokens
 
-| Status (exact label) | Icon (Lucide) | Background | Border | Text / icon | Text contrast |
+| Status (UI label) | Icon (Lucide) | Glyph + text color (lists, panels) | Solid block fill (calendar) | Text on block | Block text contrast |
 |---|---|---|---|---|---|
-| **Booked** (not yet confirmed) | `circle` (hollow) | `#F1F3F5` | `#8A95A3` dashed | `#3B4450` | 8.9:1 |
-| **Confirmed** | `circle-check` | `#E8F0FE` | `#3D7BE8` | `#1A4FB4` | 6.5:1 |
-| **Arrived** (waiting) + minutes waited | `clock` | `#FFF4E0` | `#B86E0A` | `#8A4B00` | 6.2:1 |
-| **In room** | `door-open` | `#E3F5EF` | `#2B8A6A` | `#0B6448` | 6.3:1 |
-| **Checked out** | `check` | `#F7F8F9` | `#E3E7EC` | `#5D6672` | 5.5:1 |
-| **No-show** | `circle-x` | `#FDECEA` | `#D9534A` | `#A3261A` | 6.4:1 |
-| **Cancelled** | `ban` | hidden by default ("Show cancelled" filter); when shown: transparent, dashed `#C5CCD3`, strikethrough `#5D6672` | | | 5.5:1 |
+| **Booked** (shown as "Not confirmed" in day-of views) | `circle` (hollow) | `#3B4450` | `#5B6573` | `#FFFFFF` | 5.9:1 |
+| **Confirmed** | `circle-check` | `#1A4FB4` | `#2563EB` | `#FFFFFF` | 5.2:1 |
+| **Arrived** + minutes waited | `clock` | `#8A4B00` | `#B45309` | `#FFFFFF` | 5.0:1 |
+| **In room** | `door-open` | `#0B6448` | `#047857` | `#FFFFFF` | 5.5:1 |
+| **Checked out** | `check` | `#5D6672` | `#E2E6EB` (recedes) | `#475160` | 6.4:1 |
+| **No-show** | `circle-x` | `#A3261A` | `#B42318` | `#FFFFFF` | 6.6:1 |
+| **Cancelled** | `ban` | `#5D6672`, hidden by default ("Show cancelled" filter) | no fill, dashed `#C5CCD3` outline, strikethrough | `#5D6672` | 5.5:1 |
+
+All glyph text colors are ≥ 6:1 on white. Every block shows the **status icon** (and the word when there is room), so color is never the only cue.
+
+**Visit-type palette** (only when the user switches "Color by" to visit type). Ordered for color-blind separation; checked with the data-viz palette validator. CVD separation passes; teal is at the edge of its chroma floor, which is acceptable because every block carries a text label.
+
+| Visit type | Fill | White text contrast |
+|---|---|---|
+| Follow-up | `#2563EB` | 5.2:1 |
+| Sick visit | `#C2410C` | 5.2:1 |
+| Well-child | `#007A87` | 5.1:1 |
+| Sports physical | `#BE185D` | 6.0:1 |
+| New patient | `#7C3AED` | 5.7:1 |
 
 Why these five hues: neutral, blue, amber, green and red differ in **lightness** as well as hue, and amber/blue is the color-blind-safe pair for the two statuses that need action (Confirmed vs Arrived). Red (No-show) always comes with its icon and the word.
 
 ### 2.4 Alert tokens
 
-| Tier | Background | Border | Text | Icon |
-|---|---|---|---|---|
-| Error / blocking | `#FDECEA` | `#D9534A` | `#A3261A` | `octagon-alert` |
-| Warning | `#FFF4E0` | `#B86E0A` | `#8A4B00` | `triangle-alert` |
-| Info | none (plain text) | none | `#5B6573` | `info` |
-| Success | toast only (dark `#1B2430` surface, white text) | | | `check` |
+| Tier | Treatment | Text | Icon |
+|---|---|---|---|
+| Error / blocking | The only alert that gets a box: `#FDECEA` background, `#D9534A` border, with the two resolving actions inside it | `#A3261A` | `octagon-alert` |
+| Warning | Icon + text line next to the thing it's about. No box. | `#8A4B00` | `triangle-alert` |
+| Info | Plain text | `#5B6573` | `info` |
+| Success | Toast only (dark `#1B2430` surface, white text) | | `check` |
 
 ### 2.5 Dark theme (for dim front desks and night shifts)
 
@@ -143,7 +160,7 @@ Alternatives if a brand requires: Public Sans (USWDS), Source Sans 3, IBM Plex S
 | `body` | 14 | 20 | 400 | Default UI text, form inputs (16 on touch) |
 | `body-strong` | 14 | 20 | 600 | Patient names in lists |
 | `meta` | 13 | 18 | 400 | Secondary info, table cells in dense mode |
-| `caption` | 12 | 16 | 500 | Minimum size: labels, chips. Never smaller. |
+| `caption` | 12 | 16 | 500 | Minimum size: labels, captions. Never smaller. |
 
 Rules: sentence case everywhere (no ALL CAPS except 2–3 letter abbreviations). Maximum 2 weights on one card. Numbers in tables right-aligned or monospaced.
 
@@ -151,7 +168,7 @@ Rules: sentence case everywhere (no ALL CAPS except 2–3 letter abbreviations).
 
 ## 4. Shape, elevation, icons, motion
 
-- **Radius:** 6 px controls, 10 px cards and panels, 999 px chips. One radius per element type.
+- **Radius:** 6–8 px controls and calendar blocks, 10–16 px cards and panels, 999 px only for toggle switches and avatars. One radius per element type.
 - **Borders over shadows.** Cards use a 1 px `--border`. Shadows only for floating layers (popover, menu, overlay panel): `0 8px 24px rgba(16,24,40,.12)`.
 - **No** gradients, glassmorphism, left-accent stripes, or emoji.
 - **Icons:** Lucide, 1.75 px stroke, 16 px in dense UI and 20 px in nav. An icon alone is allowed only for universally known actions (close, search, more); everything else gets a text label. Icon-only buttons need `aria-label` and a tooltip.
@@ -160,6 +177,26 @@ Rules: sentence case everywhere (no ALL CAPS except 2–3 letter abbreviations).
 ---
 
 ## 5. Components
+
+### 5.0 Clickable vs. read-only (the most important rule in this section)
+
+If something looks like a button, people will click it. If a real button looks like a label, people will miss it. NN/g's eye-tracking study found weak or ambiguous clickability signals made people about 22% slower, with more eye fixations ("click uncertainty"). Every element falls into exactly one row of this table:
+
+| Element is… | It looks like… | Never looks like… |
+|---|---|---|
+| **An action** (Book, Check in, Room) | A **button**: rectangle, 6–8 px radius, solid accent (primary) or 1.5 px outline (secondary), verb label | — |
+| **Navigation / "change"** | A **link**: accent text, underlined | A button, unless it's a primary task |
+| **An editable value** | A **field**: box with a visible border and label above; or, in sentence-style forms, dashed underline + chevron | Plain text |
+| **A choice** (visit type, provider) | **Radio rows**, a **select**, or a **segmented control** (joined segments) | Floating pills or chips |
+| **Status / metadata** (Confirmed, 12 y, Eligible) | **Plain text**, optionally with a small colored glyph | A pill, badge, border or tinted box |
+| **A calendar appointment** | A **solid block** (it opens details) | — |
+| **A draggable item** | Raised card with a grip handle (⋮⋮) + shadow | Flat text |
+| **Disabled** | The same control at reduced contrast, with a reason nearby | Hidden |
+
+Checks:
+- [ ] No rounded pill shape anywhere except on toggle switches.
+- [ ] Squint test: everything that looks raised, filled or outlined can be clicked; nothing else is.
+- [ ] Every link is underlined or sits in an obvious nav bar.
 
 ### 5.1 Buttons
 
@@ -184,7 +221,7 @@ Sizes: **32 px** (dense toolbar), **40 px** (default), **44 px** (primary on for
 
 - One box: "Search name, DOB, phone or chart #". `/` focuses it from anywhere.
 - Results show: **Last, First** (bold) · age + sex · DOB · phone · chart # (mono) · next appointment. Matching characters highlighted.
-- Look-alike records (same DOB + similar name, or same phone) carry a `Possible duplicate` warning chip **in the result row**.
+- Look-alike records (same DOB + similar name, or same phone) show a `⚠ Possible duplicate` warning (icon + text, no chip) **in the result row**.
 - Keyboard: ↑ ↓ to move, Enter to select, Esc to clear. The last item is always "+ Register new patient '<typed text>'".
 
 ### 5.4 Patient banner
@@ -194,9 +231,9 @@ Sizes: **32 px** (dense toolbar), **40 px** (default), **44 px** (primary on for
 - Fixed at the top of the patient context (panel or page). Name 16 px / 600.
 - Two identifiers minimum (name + DOB) on **every** surface that acts on a patient.
 
-### 5.5 Status badge
+### 5.5 Status text (not a badge)
 
-A pill (radius 999) with icon + label, colors from §2.3. Minimum 24 px tall. Arrived shows waiting time: `Arrived · 7 min`. It turns warning-strong after 15 min (bold text plus a filled icon), not a new color.
+Icon + word in the status text color from §2.3, with **no** background, border or pill shape (§5.0). Example: `◷ Arrived · 7 min` in `#8A4B00`. After 15 minutes the waiting time turns bold and the icon becomes filled. It stays the same color.
 
 ### 5.6 Context panel
 
@@ -245,26 +282,30 @@ This is the most important control in the product.
 - Visible hours: clinic open hours (for example 8 AM–6 PM). Scrolls to **now − 1 h** on load for today.
 - **Slot size 15 min, row height 24 px** (dense) or **32 px** (comfortable, default). Hour lines `--border` and half-hour lines `--border-subtle`. No line at 15 and 45.
 - Hour labels: "8 AM", "9 AM"… in `caption`, top-aligned with the hour line, in a 56 px gutter.
-- **Now line:** 2 px `--accent` across today's columns with a "10:05 AM" pill in the gutter.
+- **Now line:** 2 px `--accent` across today's columns with a "10:05 AM" time label in the gutter.
 - **Today** column header: date in an accent-filled circle. Weekend and closed days get a `--bg-subtle` background.
 - **Blocked time** (lunch, admin, out of office): diagonal hatch in `--bg-subtle` with a label ("Lunch"). It can't be booked unless overridden with a reason.
 - Provider column header: name (600) + specialty (meta) + day summary ("8 booked · 3 open").
 
-### 6.4 Appointment card anatomy
+### 6.4 Appointment block anatomy
+
+These are **solid blocks with white text**, in the style of Bryntum and DevExpress schedulers. The block is clickable, so it may look like an object; the grid around it stays quiet.
 
 ```
-┌─────────────────────────────────────┐
-│ 10:00–10:30  ◷ Arrived · 7 min       │  ← time (mono) + status badge
-│ Chen, Wei · 57 y                     │  ← name (600) + age = 2 identifiers
-│ Annual physical                      │  ← visit type (meta)
-└─────────────────────────────────────┘
+█████████████████████████████████████
+█ Chen, Wei, 57        ◷ Arrived 7m █  ← name (700) + age = 2 identifiers · status icon + word
+█ Annual physical                   █  ← visit type
+█ 10:00–10:30 AM                    █  ← time range
+█████████████████████████████████████
 ```
 
-- Background and border from the status token; text dark enough for ≥ 4.5:1.
+- Fill from the status "solid block fill" column (§2.3), or from the visit-type palette when the user picks "Color by: Visit type". Text is white (≥ 5:1).
+- No borders, no left stripe. 6–7 px radius, 1 px soft shadow, 3–5 px gap from the column edges.
+- Checked-out blocks use the light fill and dark text, so the past recedes.
 - 15-min appointments show a single line: `10:15 Dubois, Henri · 7 y  ◷ Arrived`. The full content is in the tooltip and the panel.
-- Selected card: 2 px `--accent` outline + 2 px offset. Never a different fill.
+- Selected block: 2–3 px outline + 2 px offset. Never a different fill.
 - Checked out cards are de-emphasized (muted) so the eye skips the past.
-- Overlapping appointments split the column width side by side (max 3), then show a "+2 more" chip.
+- Overlapping appointments split the column width side by side (max 3), then show a "+2 more" link.
 
 ### 6.5 Free slots and booking
 
@@ -273,7 +314,17 @@ This is the most important control in the product.
 - Suggested slots (from the booking panel) are highlighted in the grid with a subtle accent tint when the panel is open.
 - **Drag to move / resize** is allowed for staff with permission. On drop, a toast says what changed with **Undo**. Moving to a different day or provider asks for confirmation inline.
 
-### 6.6 Accessibility of the grid
+### 6.6 Patterns borrowed from Bryntum and DevExpress (reference screens)
+
+- **Quiet grid, loud events:** light gridlines, white background, and the solid event blocks carry the color.
+- **Big day numbers** in column headers ("Mon" small, "19" at 32–40 px); today in the accent color.
+- **Resource rows/columns with an avatar** (photo or initials) + name + a count ("8 visits · 3 open").
+- **Hatched fill** for time that can't be booked (lunch, out of office, closed days), labelled in words.
+- **Totals row** at the bottom (open/booked per provider or per day).
+- **Selection box + small popover:** selecting free time or an appointment shows an outlined box and a popover with the key facts and one primary action, so the user never leaves the grid.
+- **Toolbar:** ‹ › and the date range on the left, then a filter field, joined provider toggles and a view dropdown; primary action at the far right.
+
+### 6.7 Accessibility of the grid
 
 - The grid is a `role="grid"` with each slot a gridcell. Arrow keys move by slot and provider, Enter opens, Esc closes.
 - Each appointment button has a full accessible name: "Chen, Wei, 57 years, Annual physical, 10:00 to 10:30 AM, Dr. Beatty, Arrived, waiting 7 minutes".
@@ -287,7 +338,7 @@ This is the most important control in the product.
 - Quick picks above the month grid: **Today · Tomorrow · +1 week · +2 weeks · +1 month · +3 months** (follow-ups are usually "come back in 2 weeks").
 - In the month popover: today has an outlined circle, the selection is filled accent, days with no availability are muted with a strikethrough, and each day can show availability as a small dot ("3 open").
 - Birth dates: **never** a calendar popover. Use three typed segments (month, day, year), because scrolling back 70 years is unusable.
-- Time selection is done on the calendar or from suggested slot chips. Avoid free-typed times for booking.
+- Time selection is done on the calendar or from suggested time buttons. Avoid free-typed times for booking.
 
 ---
 
@@ -296,8 +347,8 @@ This is the most important control in the product.
 One context panel, **one progressive form**, four sections. A completed section collapses to a one-line summary with "Change".
 
 1. **Patient:** search box → select → collapses to the patient banner. A duplicate warning appears inline if relevant. "Register new patient" expands a short form (name, DOB, sex, phone; everything else later at check-in).
-2. **Visit:** visit type chips with durations ("Follow-up · 15 min"). Reason (optional). Provider (defaults to the usual one).
-3. **Time:** 3 suggested slots as selectable chips, each with a one-line reason ("Earliest · Dr. Mann"), + "or choose on the calendar". The chosen slot appears as a ghost in the grid.
+2. **Visit:** visit type as radio rows or a select, with durations ("Follow-up · 15 min"). Never chips (§5.0). Reason (optional). Provider (defaults to the usual one).
+3. **Time:** 3 suggested times as radio rows, each with a one-line reason ("Earliest · Dr. Mann"), + "or choose on the calendar". The chosen time appears as a dashed outline in the grid.
 4. **Insurance:** pre-filled from the record; eligibility runs automatically. The status shows inline (✓ Eligible · copay $25 / ⚠ Not verified, can continue).
 
 **Sticky footer:** a one-line summary ("Test, Aarav · Mon, Oct 19 · 11:00–11:15 AM · Dr. Mann") + `[Book appointment]`.

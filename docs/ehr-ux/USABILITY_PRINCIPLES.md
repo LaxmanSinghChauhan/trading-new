@@ -1,6 +1,6 @@
 # EHR Usability Principles
 
-These are the usability rules every EHR screen we design has to follow, starting with scheduling. Use them in two ways:
+These are the 15 usability rules every EHR screen we design has to follow, starting with scheduling. Use them in two ways:
 
 1. **While designing:** each principle has a short rule, the reason behind it, and concrete do's and don'ts.
 2. **While reviewing:** the checklist in section 5 is the gate a design passes before it goes to build.
@@ -37,7 +37,7 @@ We didn't invent these. They merge the following sources:
 
 ---
 
-## 3. The 14 principles
+## 3. The 15 principles
 
 ### P1. The patient's identity is never in doubt
 **Rule:** Anywhere a patient appears, show at least **two identifiers**: full name (Last, First) and date of birth with age. Add the chart number where space allows. In a patient context, a **patient banner** stays fixed at the top and never scrolls away.
@@ -122,7 +122,7 @@ We didn't invent these. They merge the following sources:
 |---|---|---|
 | Blocking (rare) | Booking would create a duplicate record for the same person | Inline panel that must be resolved before continuing, with a clear choice of two actions |
 | Warning | Eligibility not verified; patient has an outstanding balance | Inline amber notice next to the related field. Doesn't block. |
-| Info | "Asthma follow-up due this month" | Quiet text or a badge. Never a colored box. |
+| Info | "Asthma follow-up due this month" | Quiet text with an icon. Never a colored box or badge. |
 
 - Don't: dashed purple "AI · PREVIEW" boxes competing with the real form.
 
@@ -149,6 +149,15 @@ We didn't invent these. They merge the following sources:
 - Do: "Suggested · Today 11:00 AM · Dr. Mann (pediatrics, earliest)" as a selectable option among the normal choices.
 - Don't: give AI suggestions a different visual system, make them look more important than the user's own choice, or show "PREVIEW" badges in production.
 
+### P15. Clickable things look clickable, and nothing else does
+**Rule:** Every element is visibly one of these: an action (button), a link, a field, a choice (radio, select or segmented control), an appointment block, or read-only text. Read-only information never wears a button's clothes. That means no pills, badges, borders or tinted boxes around status, tags or metadata.
+
+- **Why:** NN/g's eye-tracking study found that when clickable and non-clickable things look alike, people take about 22% longer and look around more, unsure what to click. In a clinic that hesitation happens hundreds of times a day.
+- Do: status = glyph + colored word ("◷ Arrived · 7 min"); metadata = plain muted text joined with " · ".
+- Do: real buttons get one consistent shape and verb labels ("Room patient", "Book appointment").
+- Don't: rounded pills for statuses, tags, visit types or filters (Round 1 options A–G did this; see §4).
+- Test: squint at the screen. Everything that looks raised, filled or outlined should be clickable, and nothing else.
+
 ---
 
 ## 4. Audit of the current drafts (V1 and V2)
@@ -160,7 +169,7 @@ This explains why the current canvas feels messy and confusing. Each issue is ma
 | 1 | 7 status colors (blue, green, amber, violet, gray, red, strike-through) plus a legend row | P4, P5 | 5 semantic hues, each with an icon and a word on the card. No legend. |
 | 2 | Wizard card (5 step tiles + progress bar) above the calendar, plus form, AI box and activity log on one screen | P2, P6 | One booking panel with a progressive single form. The calendar is the only other region. |
 | 3 | Dark teal header, teal buttons, purple AI boxes, orange warnings, green success boxes: no single accent | P4 | Neutral shell. One accent for interaction. Color only where it means something. |
-| 4 | Left-accent borders on every event block | P4, P6 | Full soft tinted card with a status icon. The color carries status, not decoration. |
+| 4 | Left-accent borders on every event block | P4, P6 | Solid status-colored block with white text and a status icon. The color carries status, not decoration. |
 | 5 | Mixed time formats (09:52, 10:30 AM, "Mon 10:30") | P10, P13 | One format. Every booking shows weekday, date, start–end, provider. |
 | 6 | Free slots are invisible until hover ("+ 08:15" in transparent text) | P5, P12 | A visible "Open" affordance on hover **and** a keyboard path. Suggested slots are listed explicitly. |
 | 7 | Day chips duplicate the date navigation; two segmented controls ("Day · providers" / "Week · one provider") | P3, P9 | Standard Today ‹ › date label, a mini-month, and one view switch. |
@@ -170,6 +179,14 @@ This explains why the current canvas feels messy and confusing. Each issue is ma
 | 11 | Small 11–12 px gray labels (#5a6474 at 11 px) | P12 | Minimum 12 px for meta text, 14 px for body, contrast ≥ 4.5:1. |
 | 12 | "Fill sample data", "simulated" and debug text in the UI | P10 | Prototype-only helpers live outside the product frame. |
 
+
+### Feedback on Round 1 (options A–G)
+
+| What the reviewer saw | Principle broken | Fix in Round 2 (H–N) and the guidelines |
+|---|---|---|
+| "Everything looks like a button, even labels": status pills, tag chips, visit-type chips and filter pills all had borders or fills | P15 | Status = glyph + word; choices = radio rows, selects or segmented controls; pills banned (UX guidelines §5.0) |
+| "Still looks basic and similar to V1/V2": all seven reused one dashboard layout (top bar, side panel, white cards) | P3 is about familiar *patterns*, not identical screens | Round 2 explores different metaphors (paper day sheet, sentence, arrivals board, floor plan) and the reviewer's references (Bryntum timeline, DevExpress week view: quiet grid, solid event blocks) |
+| Event cards were pale tints with borders, so low visual weight | P6 | Solid status-colored blocks with white text (≥ 5:1) on a quiet grid |
 ---
 
 ## 5. Review checklist (copy this into every design review)
@@ -184,6 +201,7 @@ This explains why the current canvas feels messy and confusing. Each issue is ma
 - [ ] One primary (solid accent) button per view
 - [ ] Neutral shell, one accent, semantic colors only for status and alerts
 - [ ] Every status shows color + icon + word; no legend needed
+- [ ] Squint test: only clickable things look raised, filled or outlined; no pills or badges on read-only text
 - [ ] Information is grouped, aligned to one grid, nothing purely decorative
 - [ ] Words match the clinic's vocabulary; one time format throughout
 
@@ -238,4 +256,5 @@ This explains why the current canvas feels messy and confusing. Each issue is ma
 - Dense display in primary care EHRs (AHRQ project): https://digital.ahrq.gov/ahrq-funded-projects/use-dense-display-data-and-information-design-principles-primary-care-health
 - W3C, What's new in WCAG 2.2: https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/
 - Microsoft guidance on when to use wizards: https://learn.microsoft.com/en-us/windows/win32/uxguide/win-wizards
+- NN/g, Flat UI elements attract less attention and cause uncertainty: https://www.nngroup.com/articles/flat-ui-less-attention-cause-uncertainty/
 - NHS Common User Interface standards (withdrawn, historical reference for banner and date display): https://standards.nhs.uk/published-standards/common-user-interface-standards
