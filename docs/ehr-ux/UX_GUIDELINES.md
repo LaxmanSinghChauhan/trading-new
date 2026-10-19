@@ -302,6 +302,13 @@ These are **solid blocks with white text**, in the style of Bryntum and DevExpre
 - Fill from the status "solid block fill" column (§2.3), or from the visit-type palette when the user picks "Color by: Visit type". Text is white (≥ 5:1).
 - No borders, no left stripe. 6–7 px radius, 1 px soft shadow, 3–5 px gap from the column edges.
 - Checked-out blocks use the light fill and dark text, so the past recedes.
+
+**Allowed alternative: "soft" blocks** (from the Syncfusion reference). Pick **one** style per product, never both.
+
+- Pastel tint background, a 4 px left stripe in the strong hue, and dark text (`#1B2230`, ≥ 13:1 on every tint).
+- A visit-type icon before the name, the time range on the second line, and a status icon (or ↻ for repeating blocks like lunch) in the top-right corner.
+- Tints: Follow-up `#DBEAFE`/`#2563EB` · Sick visit `#FFEDD5`/`#C2410C` · Well-child `#D5F0F2`/`#007A87` · Sports physical `#FCE7F3`/`#BE185D` · New patient `#EDE9FE`/`#7C3AED` · Lunch/blocked `#EEF2F7`/`#94A3B8`.
+- Soft blocks suit week views with many short visits. Solid blocks suit day views where status has to jump out.
 - 15-min appointments show a single line: `10:15 Dubois, Henri · 7 y  ◷ Arrived`. The full content is in the tooltip and the panel.
 - Selected block: 2–3 px outline + 2 px offset. Never a different fill.
 - Checked out cards are de-emphasized (muted) so the eye skips the past.

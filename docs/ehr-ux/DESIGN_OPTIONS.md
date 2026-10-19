@@ -49,3 +49,10 @@ So Round 2 follows the new clickability rule (P15 in USABILITY_PRINCIPLES.md, §
 | **N · Day Scheduler** *(both references)* | Day view by provider with avatar headers, solid status blocks, hatched lunch and admin time, now line, totals row, and an appointment popover with the next action ("Room patient · Exam 1 is ready") | Front desk "home" screen: see the day and act on it | Dense on small screens; needs the List view as its mobile fallback |
 
 **Suggested combination:** **N** as the Schedule home, **M** for booking within a provider's week, **L** for long-range capacity, plus **J** or **K** as the day-of flow screen. They share the same tokens, so they can live in one product.
+
+### From the latest references (O–P)
+
+| Option | Built from | Best for | Main trade-off |
+|---|---|---|---|
+| **O · Front Desk Dashboard** | Booking-dashboard reference: warm orange accent, soft rounded cards, tab nav, donut of today's appointments (still to come / here now / checked out), "waiting longest" callout, sortable appointments table with avatars, rooms panel with soft blocks | A morning-to-evening home screen for the front desk lead | The orange accent sits close to the amber "Arrived" color. If chosen, move Arrived to a different hue or tone the accent down. A donut is an at-a-glance summary only; numbers are always printed beside it |
+| **P · Work Week** | Syncfusion reference: Today button, ‹ › date range, provider dropdown, view dropdown (Day / Week / Work Week / Month / Timeline), "All day" row, light grid, soft pastel blocks with stripe + visit-type icon, repeating lunch, red now line | Booking within one provider's week with many short visits | Colors show visit type, so status is only a corner icon; less glanceable for day-of status work (pair with N or J) |
