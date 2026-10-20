@@ -203,7 +203,11 @@ Hinglish example row:
 ## Files
 
 - `scripts/trainsearch.py`: all commands (`trains`, `route`, `ct-search`, `avl`, `plan`, `fetch`,
-  `report`).
+  `report`, plus `irctc-checklist` and `record` for live IRCTC checks).
+- To confirm on **IRCTC itself** (live, no cache) in the user's logged-in browser, use the
+  `irctc-upstream-finder` skill if it is installed. It reuses this script: plan, then a ConfirmTkt
+  pre-screen, then `irctc-checklist` to pick the few stations worth checking, then IRCTC readings
+  saved with `record`, then `report --source "IRCTC live"`.
 - `references/api-notes.md`: endpoints, headers, field layouts, and how to rediscover the ConfirmTkt
   API if it changes. Read it when a call fails or returns an odd shape.
 - `references/railway-rules.md`: quotas, status strings, RAC, boarding point, ticket dates, Tatkal

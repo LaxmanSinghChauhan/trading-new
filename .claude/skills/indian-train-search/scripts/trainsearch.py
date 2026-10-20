@@ -12,6 +12,9 @@ Subcommands (run any of them with -h for options):
              stations, work out the ticket date for every station
   fetch      live availability for every (train, from-station, class) job of a plan, in parallel
   report     markdown summary + detail tables and best.json from a plan and fetched availability
+  irctc-checklist  which IRCTC searches are worth running (grouped per from-station), from a plan
+             and optionally a ConfirmTkt pre-screen
+  record     store availability read off IRCTC (or another site) so `report` can use it
 
 Typical run:
   trainsearch.py plan  --from BAQ --to NZM --start 2026-11-10 --end 2026-11-15 \
@@ -283,6 +286,21 @@ def parse_status(st):
     return (7, 0), s
 
 
+def rule_chance(label, days_left):
+    """Rough confirmation chance for a WL label when no model % is available (e.g. IRCTC readings).
+    General quota clears best, Remote Location less, Pooled Quota least; more days left helps.
+    A rule of thumb, not data: say so when you use it."""
+    m = re.match(r"([A-Z]*WL)\s*(\d+)", label or "")
+    if not m:
+        return ""
+    q, n = m.group(1), int(m.group(2))
+    hi, mid = {"GNWL": (10, 30), "RLWL": (3, 10), "PQWL": (2, 6)}.get(q, (0, 3))
+    level = 2 if n <= hi else 1 if n <= mid else 0
+    if days_left is not None and days_left < 3:
+        level = max(0, level - 1)
+    return ["Low", "Medium", "High"][level] + "*"
+
+
 # ---------------------------------------------------------------- plan
 
 def board_offset(dep, window):
@@ -522,7 +540,7 @@ LABELS = {
         "from": "From (ticket date)", "dep": "Dep", "pool": "Pool", "ticket": "ticket",
         "skipped": "Skip ki gayi trains", "errors": "Jo fetch nahi ho paaya",
         "legend": ("(+1) = agla din. `@STN` = is class ke liye best from-station; bracket mein {frm} ka apna "
-                   "status. % = ConfirmTkt ka confirm chance (sirf andaza). Same Pool letter = un stations "
+                   "status. % = ConfirmTkt ka confirm chance (sirf andaza); High*/Medium*/Low* = quota aur WL number se rule-of-thumb. Same Pool letter = un stations "
                    "ka status bilkul same hai (ek hi quota), wahan se book karne ka fayda nahi. † = ConfirmTkt ka purana cache (2 ghante se zyada), IRCTC pe dobara dekho."),
         "source": "Data: ConfirmTkt live availability (IRCTC se), {t0} – {t1} IST. Route/timetable: erail.in.",
         "none": "Is raat koi train nahi.",
@@ -534,7 +552,7 @@ LABELS = {
         "from": "From (ticket date)", "dep": "Dep", "pool": "Pool", "ticket": "ticket",
         "skipped": "Skipped trains", "errors": "Not fetched",
         "legend": ("(+1) = next day. `@STN` = best from-station for that class; brackets show {frm}'s own "
-                   "status. % = ConfirmTkt confirmation estimate. Same Pool letter = identical status "
+                   "status. % = ConfirmTkt confirmation estimate; High*/Medium*/Low* = rule of thumb from quota type and WL number. Same Pool letter = identical status "
                    "(same quota), so booking from there gains nothing. † = older ConfirmTkt cache snapshot (>2 h); re-check on IRCTC."),
         "source": "Data: ConfirmTkt live availability (sourced from IRCTC), {t0} – {t1} IST. Route/timetable: erail.in.",
         "none": "No train this night.",
@@ -559,6 +577,8 @@ def cmd_report(a):
             return None
         rank, label = parse_status(x.get("status"))
         pred = (x.get("pred") or "").replace(" Chance", "") if rank[0] == 2 else ""
+        if rank[0] == 2 and not pred:
+            pred = rule_chance(label, (dt.date.fromisoformat(date) - now_ist().date()).days)
         age = age_minutes(x.get("ts")) if x.get("ts") else None
         if age is not None and a.stale and age > a.stale:
             label += "†"
@@ -589,7 +609,8 @@ def cmd_report(a):
 
     stamps = sorted(s for v in res.values() for s in v.get("timeStamps", []) if s)
     head = [f"# {L['title'].format(frm=frm, to=to, n0=fmt(plan['nights'][0]), n1=fmt(plan['nights'][-1]))}", "",
-            L["source"].format(t0=stamps[0][:16].replace('T', ' ') if stamps else "?",
+            (a.source + ", {t0} – {t1} IST." if a.source else L["source"]).format(
+                               t0=stamps[0][:16].replace('T', ' ') if stamps else "?",
                                t1=stamps[-1][:16].replace('T', ' ') if stamps else "?"),
             f"Window {plan['window'][0]}–{plan['window'][1]} at {frm}." +
             (f" Only trains ending at {to}." if plan.get("must_end_at_dest") else ""),
@@ -684,6 +705,114 @@ def cmd_report(a):
     dump(best_json, os.path.join(a.outdir, "best.json"))
     print("\n".join(summary))
     log(f"wrote summary.md, detail.md, best.json to {a.outdir}")
+
+
+# ---------------------------------------------------------------- IRCTC hand-off
+
+def _sdate(night, st):
+    return (dt.date.fromisoformat(night) + dt.timedelta(days=st["offset"])).isoformat()
+
+
+def cmd_irctc_checklist(a):
+    """Which IRCTC searches are worth doing. One IRCTC search (From X, To Y, date D) lists every train
+    from X that day, and clicking a class shows several days, so searches are grouped per station.
+    With --avl (a ConfirmTkt pre-screen), only stations whose quota pool beats the boarding
+    station on some night are kept; without it: boarding station, origin, junctions."""
+    plan = json.load(open(a.plan))
+    res = json.load(open(a.avl)) if a.avl else {}
+    classes = [c.strip().upper() for c in a.classes.split(",") if c.strip()]
+    picks = {}  # station code -> {"name", "trains": {train: {"classes": set, "dates": set, "why": set}}}
+
+    skipped = []
+
+    def add(t, st, cls, why, nights=None):
+        e = picks.setdefault(st["code"], {"name": st["name"], "seq_hint": st["seq"], "trains": {}})
+        tr = e["trains"].setdefault(t["train"], {"name": t["name"], "dep": st["dep"], "classes": set(),
+                                                 "dates": set(), "why": set()})
+        tr["classes"].add(cls)
+        tr["dates"].update(_sdate(n, st) for n in (nights or t["nights"]))
+        tr["why"].add(why)
+
+    for t in plan["trains"]:
+        stations = sorted(t["stations"], key=lambda s: s["seq"])
+        board = next(s for s in stations if s["is_board"])
+        for cls in classes:
+            if t.get("classes") and cls not in t["classes"]:
+                continue
+            add(t, board, cls, "baseline (boarding station)")
+            if res:
+                pools = {}
+                for st in stations:
+                    r = res.get(f"{t['train']}|{st['code']}|{cls}")
+                    if r and r.get("days"):
+                        sig = tuple((r["days"].get(_sdate(n, st)) or {}).get("status") for n in t["nights"])
+                        pools.setdefault(sig, []).append(st)
+                bsig = next((k for k, v in pools.items() if board in v), None)
+                ranked = []
+                for sig, members in pools.items():
+                    if sig == bsig:
+                        continue
+                    wins = [n for n, x, y in zip(t["nights"], sig, bsig or [None] * len(sig))
+                            if x and parse_status(x)[0] < parse_status(y)[0]]
+                    if wins:
+                        rep = max(members, key=lambda s: s["seq"])  # nearest member: cheapest fare
+                        best = min(parse_status(x)[0] for x in sig if x)
+                        fr = (res.get(f"{t['train']}|{rep['code']}|{cls}") or {}).get("fare")
+                        fb = (res.get(f"{t['train']}|{board['code']}|{cls}") or {}).get("fare")
+                        extra = fr - fb if fr and fb else None
+                        if extra is not None and a.max_extra_fare and extra > a.max_extra_fare:
+                            skipped.append(f"{t['train']} {cls} @{rep['code']} (+₹{extra:.0f})")
+                            continue
+                        ranked.append((best, rep, wins, extra))
+                for best, rep, wins, extra in sorted(ranked, key=lambda r: r[0])[:a.max_per_train]:
+                    add(t, rep, cls, "pre-screen better on " + ", ".join(dt.date.fromisoformat(n).strftime("%d %b")
+                                                                         for n in wins) +
+                        (f" (+₹{extra:.0f})" if extra else ""), nights=wins)
+            else:
+                extra = [s for s in stations if not s["is_board"] and
+                         (s["is_origin"] or re.search(r"\bJN\b", s["name"].upper()) or s["code"] in csv_set(a.stations))]
+                for st in sorted(extra, key=lambda s: -s["seq"])[:a.max_per_train]:
+                    add(t, st, cls, "origin" if st["is_origin"] else "junction / named")
+
+    searches = []
+    for code, e in sorted(picks.items(), key=lambda kv: -kv[1]["seq_hint"] if kv[0] != plan["from"] else -1e9):
+        dates = sorted({d for tr in e["trains"].values() for d in tr["dates"]})
+        searches.append({"from": code, "name": e["name"], "to": plan["to"], "first_date": dates[0],
+                         "last_date": dates[-1],
+                         "trains": [{"train": tn, "name": tr["name"], "dep": tr["dep"], "classes": sorted(tr["classes"]),
+                                     "dates": sorted(tr["dates"]), "why": sorted(tr["why"])}
+                                    for tn, tr in sorted(e["trains"].items())]})
+    dump({"from": plan["from"], "to": plan["to"], "searches": searches, "skipped_expensive": skipped}, a.out)
+    fmt = lambda iso: dt.date.fromisoformat(iso).strftime("%d %b")
+    print(f"IRCTC checklist: {len(searches)} searches (quota GENERAL, class 'All Classes'). Saved {a.out}")
+    for i, sch in enumerate(searches, 1):
+        print(f"{i}. From {sch['from']} ({sch['name']}) -> {sch['to']}, search date {fmt(sch['first_date'])}"
+              f"{' … ' + fmt(sch['last_date']) if sch['last_date'] != sch['first_date'] else ''}")
+        for tr in sch["trains"]:
+            print(f"   - {tr['train']} {tr['name']} (dep {tr['dep']}): {', '.join(tr['classes'])}; "
+                  f"dates {', '.join(fmt(d) for d in tr['dates'])}  [{'; '.join(tr['why'])}]")
+    if skipped:
+        print(f"Skipped (more than ₹{a.max_extra_fare:.0f} extra fare): " + ", ".join(skipped))
+
+
+def cmd_record(a):
+    """Store availability read off IRCTC (or any site) in the same format `fetch` writes, so
+    `report` works on it. Each --status is DATE=STATUS, DATE being the ticket date at --from."""
+    data = json.load(open(a.out)) if os.path.exists(a.out) else {}
+    key = f"{a.train}|{a.frm.upper()}|{a.cls.upper()}"
+    e = data.setdefault(key, {"days": {}, "fare": None, "timeStamps": [], "errors": [], "needed": []})
+    ts = now_ist().isoformat(timespec="seconds")
+    for item in a.status:
+        d, st = item.split("=", 1)
+        d = parse_date(d.strip()).isoformat()
+        e["days"][d] = {"status": st.strip(), "pred": a.pred or None, "ts": ts, "source": a.source}
+        if d not in e["needed"]:
+            e["needed"].append(d)
+    if a.fare:
+        e["fare"] = a.fare
+    e["timeStamps"].append(ts)
+    dump(data, a.out)
+    print(f"recorded {key}: " + ", ".join(a.status))
 
 
 # ---------------------------------------------------------------- small commands
@@ -809,9 +938,32 @@ def main():
     s.add_argument("--classes", default="", help="default: classes present in --avl")
     s.add_argument("--lang", choices=sorted(LABELS), default="hinglish")
     s.add_argument("--outdir", default=".")
+    s.add_argument("--source", default="", help="data source label for the header, e.g. 'IRCTC (live, logged in)'")
     s.add_argument("--stale", type=float, default=120,
                    help="mark cells whose ConfirmTkt snapshot is older than this many minutes with † (0 = off)")
     s.set_defaults(fn=cmd_report)
+
+    s = sub.add_parser("irctc-checklist", help="which IRCTC searches to run (grouped per from-station)")
+    s.add_argument("--plan", required=True)
+    s.add_argument("--avl", default="", help="ConfirmTkt pre-screen from `fetch` (recommended)")
+    s.add_argument("--classes", default="3A,2A")
+    s.add_argument("--stations", default="", help="without --avl: extra station codes to include")
+    s.add_argument("--max-per-train", type=int, default=2, help="upstream stations per train and class")
+    s.add_argument("--max-extra-fare", type=float, default=500,
+                   help="with --avl: drop upstream picks costing more than this over the boarding fare (0 = keep all)")
+    s.add_argument("--out", default="irctc_checklist.json")
+    s.set_defaults(fn=cmd_irctc_checklist)
+
+    s = sub.add_parser("record", help="store availability read on IRCTC/another site (fetch format)")
+    s.add_argument("--out", default="irctc.json")
+    s.add_argument("--train", required=True)
+    s.add_argument("--from", dest="frm", required=True, help="the ticket's from-station")
+    s.add_argument("--cls", required=True)
+    s.add_argument("--status", nargs="+", required=True, help="DATE=STATUS ..., e.g. 2026-11-15='RAC 16'")
+    s.add_argument("--fare", type=float, default=None)
+    s.add_argument("--pred", default="", help="probability text if the site shows one")
+    s.add_argument("--source", default="IRCTC")
+    s.set_defaults(fn=cmd_record)
 
     a = p.parse_args()
     a.fn(a)

@@ -1,0 +1,23 @@
+{
+  "skill_name": "irctc-upstream-finder",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "IRCTC kholo, main login karunga. BAQ se Hazrat Nizamuddin jaana hai 13 se 15 Nov 2026 ke beech raat ko, AC (3A/2A). BAQ ke pehle kaun se station se ticket lun jahan seat mil rahi ho, boarding BAQ daal dunga. Chances bhi batao. Cached data nahi chahiye.",
+      "expected_output": "Phase 1 checklist (BAQ baseline + only better-pool upstream stations like Itarsi for 12192), IRCTC opened in the user's browser and login handed to the user, checklist searched read-only, readings recorded, report with chances and an exact booking recipe (from station, ticket date, boarding station BAQ); no credentials typed, no Book Now.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "ConfirmTkt pe RLWL dikha raha hai par mujhe bharosa nahi. Main IRCTC pe logged in hoon Chrome mein. Vidisha se NDLS 5 Dec raat 3A check karo, Bhopal/Itarsi se lena better hoga kya?",
+      "expected_output": "Uses the user's logged-in Chrome tab, checks BHS baseline and BPL/ET on IRCTC with correct ticket dates, records readings, compares against the cached numbers, gives chance and booking recipe.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Open IRCTC so I can log in, then find me any live 2A availability from Kota to Mumbai Central on 21 Dec night, including from stations before Kota.",
+      "expected_output": "English output; if no browser tool is available, explains in one line that IRCTC must run on the user's computer and still delivers the Phase 1 checklist.",
+      "files": []
+    }
+  ]
+}
