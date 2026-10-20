@@ -102,6 +102,11 @@ The body is empty. The response has `data.avlDayList[]` with `availablityDate` (
   `errorMessage {code: 533, message: "Unable to process your request"}`.
 - A class the train doesn't have gives an error or an empty list. Show it as n/a.
 - `dateOfJourney` is the date at `sourceStationCode` (the ticket's from-station), the same as IRCTC.
+- Caching: answers are cached per (train, class, from, to, dateOfJourney). Re-sending the same
+  query returns the identical `timeStamp` (seen 8+ hours old). Other client ids (`ct-mweb`) and
+  extra params (`refresh`, `forceRefresh`) don't bypass it. An earlier `dateOfJourney` (a different
+  key) usually brings a fresh snapshot that still includes the later dates. `data.fromCache` is 1
+  for nearly all answers, so use `timeStamp` for age.
 
 ## 6. Rediscovering the ConfirmTkt API if it changes
 
@@ -116,6 +121,14 @@ The body is empty. The response has `data.avlDayList[]` with `availablityDate` (
 
 ## 7. What did not work (Oct 2026)
 
-- `railway-mcp.amithv.xyz`: HTTP 525 (Cloudflare origin SSL failure), including `/mcp`.
-- `www.ixigo.com`, `www.irctc.co.in`: HTTP 403 to curl (bot protection).
+- `railway-mcp.amithv.xyz`: HTTP 525 (Cloudflare origin SSL failure), including `/mcp`, on both
+  18 and 20 Oct.
+- `www.ixigo.com`, `www.irctc.co.in`: HTTP 403 to curl. IRCTC also returned 403 "Access Denied"
+  (Akamai) to headless Chromium via Playwright, which looks like a cloud-IP block.
+- RailYatri: `GET https://trainticketapi.railyatri.in/api/trains-between-station-with-sa.json?from=BAQ&to=NZM&dateOfJourney=10-11-2026&action=train_between_station&controller=train_ticket_tbs&device_type_id=6&from_code=BAQ&journey_date=10-11-2026&journey_quota=GN&to_code=NZM&authentication_token=&v_code=null&user_id=-1&temp_user_id=-1`
+  works without login. `train_between_stations[].sa_data[]` holds `availibility` (sic) and
+  `seat_availibility[].last_updated_at`. This is RailYatri's own cache: one entry showed
+  `AVAILABLE-0051` "As of 1 month ago" while live IRCTC-relayed data showed WL. Its "Tap to refresh"
+  didn't fire a capturable request in headless mode. Its `class_type[].coach_count` was also stale
+  (3E = 0 on 12192).
 - erail route with a train number in Data1: wrong train, see section 3.

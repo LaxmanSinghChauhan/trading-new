@@ -34,8 +34,12 @@ offers it; tell the user what to book and let them do it.
 2. `scripts/trainsearch.py` (bundled; Python 3 standard library only). It uses erail.in for
    trains/routes/timetable and ConfirmTkt's public web API for live availability (ConfirmTkt relays
    IRCTC). Both worked from a cloud container in Oct 2026.
-3. Browser sites: ixigo and irctc.co.in returned 403 to scripted requests. Only try them in a real
-   browser tool for a final cross-check, and stay on the read-only availability pages.
+3. Browser sites, for a final cross-check only and only on the read-only availability pages:
+   - irctc.co.in returned 403 (Akamai "Access Denied") even to headless Chromium from a cloud IP.
+   - ixigo also returned 403, and it is ConfirmTkt's parent company, so it isn't an independent source.
+   - RailYatri's `trainticketapi.railyatri.in/api/trains-between-station-with-sa.json` serves
+     its own cache, with `last_updated_at` (seen a month old). It isn't a real cross-check unless
+     that timestamp is recent.
 
 Run the script as `python3 -I <skill-dir>/scripts/trainsearch.py <command> ...`. Put outputs in a
 scratch/work directory (the session scratchpad if there is one), not in a git repo. Each subcommand
@@ -106,6 +110,12 @@ python3 -I trainsearch.py fetch --plan plan.json --classes SL,3A,2A --out avl.js
 - With more than ~40 lookups, run it in the background and keep the user posted. `--resume` keeps
   results that are already saved.
 - Be polite: keep `--workers` ≤ 6 and `--pause` ≥ 1.
+- Freshness: ConfirmTkt caches each answer per (train, class, from, to, **start date**), so asking
+  again returns the same snapshot, possibly hours old. `--max-age 90` (the default) re-asks any
+  older date using an earlier start date: that is a different cache key, and its answer still
+  contains the target date. Every date keeps its own `ts`.
+- To answer "is this correct/current", count the cells whose `ts` is older than ~90 min and report
+  that number.
 
 ### 5. Build the tables
 
@@ -119,6 +129,9 @@ This writes:
 - `detail.md`: every station row with fares and a Pool letter. The same letter means identical
   status, i.e. the same quota, so buying there gains nothing.
 - `best.json`: the per-class picks in machine-readable form.
+- `†` marks cells whose snapshot is older than `--stale` minutes (default 120).
+- A "Coach check" line lists classes that ConfirmTkt sells but erail's coach composition doesn't
+  show. Re-run `plan` for fresh compositions, since an old plan carries old coach lists.
 
 ### 6. Decide and answer
 
@@ -177,8 +190,11 @@ Hinglish example row:
   `availablityDate` (API spelling) comes back unpadded (`9-11-2026`). The script normalises it.
 - Asking ConfirmTkt for a date the train doesn't run returns error 533 "Unable to process your
   request". The plan only asks for running dates.
-- ConfirmTkt `timeStamp` is IST and can be several hours old (server cache). The report prints the
-  range.
+- ConfirmTkt `timeStamp` is IST and can be several hours old (server cache). `fromCache: 1` is set
+  on most answers even when fresh, so judge freshness by `timeStamp`. Same start date means the same
+  snapshot; an earlier start date gets a new one (see `--max-age`).
+- Coach composition changes over time: 12192 had no 3E coach in April 2026 data and one 3E coach in
+  Oct 2026. A train with a single 3E/2A/1A coach has a tiny quota, so say so.
 - Booking from an intermediate station in the same division usually shows exactly the same RLWL as
   the boarding station (one pool). Gains come from the origin, from junctions sharing the origin's
   GN quota (e.g. Itarsi for the Jabalpur–NZM train), or from stations with GN where the boarding

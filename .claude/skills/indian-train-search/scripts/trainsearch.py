@@ -128,12 +128,29 @@ def dump(obj, path):
 
 # ---------------------------------------------------------------- erail.in
 
+COACH_PREFIX_CLASS = {"M": "3E", "C": "CC", "E": "EC", "D": "2S"}
+
+
+def coach_counts(comp):
+    """erail composition 'S,S1,SL:B,B1,3A:M,M1,:H,H1,1A:HA,HA1,1A+2A' -> {'SL': 1, '3A': 1, '3E': 1, ...}."""
+    out = {}
+    for c in (comp or "").split(":"):
+        p = c.split(",")
+        if len(p) < 3 or not p[1]:
+            continue
+        for cls in (p[2] or COACH_PREFIX_CLASS.get(p[0], "")).split("+"):
+            if cls:
+                out[cls] = out.get(cls, 0) + 1
+    return out
+
+
 def _erail_row(f):
-    # Field positions verified Oct 2026; f[33] is erail's internal train id (needed for routes).
+    # Field positions verified Oct 2026; f[33] is erail's internal train id (needed for routes),
+    # f[59] the coach composition.
     return {"train": f[0], "name": f[1].strip(), "origin": f[3], "origin_name": f[2].strip(),
             "dest": f[5], "dest_name": f[4].strip(), "from": f[7], "to": f[9],
             "dep": hhmm(f[10]), "arr": hhmm(f[11]), "duration": hhmm(f[12]), "days": f[13],
-            "type": f[32], "erail_id": f[33]}
+            "type": f[32], "erail_id": f[33], "coaches": coach_counts(f[59]) if len(f) > 59 else {}}
 
 
 def _erail_rows(txt):
@@ -221,12 +238,26 @@ def ct_avl(train, frm, to, cls, date, quota="GN"):
     for x in data.get("avlDayList") or []:
         d, m, y = (int(p) for p in x["availablityDate"].split("-"))  # sic: API spelling, unpadded "9-11-2026"
         days[dt.date(y, m, d).isoformat()] = {"status": x.get("availablityStatus"),
-                                               "pred": x.get("prediction"), "ct": x.get("confirmTktStatus")}
+                                               "pred": x.get("prediction"), "ct": x.get("confirmTktStatus"),
+                                               "ts": data.get("timeStamp"), "cached": data.get("fromCache")}
     err = data.get("errorMessage") or j.get("errorMessage")
     if isinstance(err, dict):
         err = f"{err.get('code')}: {str(err.get('message', '')).strip()}"
     return {"days": days, "fare": (data.get("fareInfo") or {}).get("totalFare"),
-            "timeStamp": data.get("timeStamp"), "error": None if days else (err or "no avlDayList")}
+            "timeStamp": data.get("timeStamp"), "fromCache": data.get("fromCache"),
+            "error": None if days else (err or "no avlDayList")}
+
+
+def now_ist():
+    return dt.datetime.now(dt.timezone.utc).replace(tzinfo=None) + dt.timedelta(hours=5, minutes=30)
+
+
+def age_minutes(ts):
+    """Age of a ConfirmTkt timeStamp (IST, e.g. '2026-10-20T08:04:10.787') in minutes; None if unknown."""
+    try:
+        return (now_ist() - dt.datetime.fromisoformat(ts[:19])).total_seconds() / 60
+    except (TypeError, ValueError):
+        return None
 
 
 def parse_status(st):
@@ -350,7 +381,7 @@ def cmd_plan(a):
             stations.append({"code": s["code"], "name": s["name"], "seq": s["seq"], "dep": s["dep"],
                              "offset": s["day"] - b["day"] + off, "is_board": s is b,
                              "is_origin": s["seq"] == stops[0]["seq"]})
-        trains.append({**base, "days": days, "days_text": fmt_days(days),
+        trains.append({**base, "days": days, "days_text": fmt_days(days), "coaches": r.get("coaches") or {},
                        "board": {"code": b_code, "dep": b["dep"], "offset": off},
                        "to": d_code, "dest_arr": d["arr"], "arr_offset": d["day"] - b["day"] + off,
                        "nights": [n.isoformat() for n in running], "stations": stations,
@@ -358,6 +389,24 @@ def cmd_plan(a):
         for st in stations:
             jobs.append({"train": tno, "from": st["code"], "to": d_code,
                          "dates": [(n + dt.timedelta(days=st["offset"])).isoformat() for n in running]})
+
+    # Coach classes per train (ConfirmTkt search lists them), so fetch skips classes a train lacks.
+    need = {t["train"] for t in trains}
+    for n in sorted({n for t in trains for n in t["nights"]}):
+        if not need:
+            break
+        bdate = dt.date.fromisoformat(n) + dt.timedelta(days=1 if any(
+            t["board"]["offset"] for t in trains if t["train"] in need and n in t["nights"]) else 0)
+        for bd in sorted({dt.date.fromisoformat(n), bdate}):
+            try:
+                found = {x["train"]: x["classes"] for x in ct_search(frm, to, bd)["trains"] if x.get("classes")}
+            except Exception as e:
+                log(f"warning: ConfirmTkt search failed for {bd}: {e}")
+                continue
+            for t in trains:
+                if t["train"] in need and t["train"] in found:
+                    t["classes"] = found[t["train"]]
+                    need.discard(t["train"])
 
     plan = {"from": frm, "to": to, "window": list(window), "nights": [n.isoformat() for n in nights],
             "must_end_at_dest": a.must_end_at_dest, "created": dt.datetime.now().isoformat(timespec="seconds"),
@@ -369,7 +418,8 @@ def cmd_plan(a):
         sts = ", ".join(f"{s['code']}({s['offset']:+d})" for s in t["stations"])
         print(f"  KEEP {t['train']} {t['name']}: {t['origin']}->{t['dest']}, {t['board']['code']} {t['board']['dep']}"
               f"{' (+1)' if t['board']['offset'] else ''}, {t['to']} {t['dest_arr']} (+{t['arr_offset']}), "
-              f"runs {t['days_text']}, nights {len(t['nights'])}; stations {sts}")
+              f"runs {t['days_text']}, nights {len(t['nights'])}, classes {','.join(t.get('classes') or ['?'])}; "
+              f"stations {sts}")
     for s in skipped:
         print(f"  SKIP {s['train']} {s['name']}: {s['reason']}")
     print(f"{len(jobs)} station jobs -> about {len(jobs) * 2} calls per class. Plan saved to {a.out}")
@@ -377,27 +427,59 @@ def cmd_plan(a):
 
 # ---------------------------------------------------------------- fetch
 
-def fetch_one(job, cls, to, quota, pause):
+def fetch_one(job, cls, to, quota, pause, max_age=None):
     need = sorted(set(job["dates"]))
     got, errors, stamps, fare, tried = {}, [], [], None, set()
-    for _ in range(len(need) + 1):
-        missing = [d for d in need if d not in got and d not in tried]
-        if not missing:
-            break
-        d0 = missing[0]
+
+    def ask(d0):
+        nonlocal fare
         tried.add(d0)
         try:
             r = ct_avl(job["train"], job["from"], to, cls, dt.date.fromisoformat(d0), quota)
         except Exception as e:
             errors.append(f"{d0}: {e}")
-            continue
+            return None
+        finally:
+            time.sleep(pause)
         if r["days"]:
-            got.update(r["days"])
             fare = fare or r["fare"]
             stamps.append(r["timeStamp"])
-        else:
-            errors.append(f"{d0}: {r['error']}")
-        time.sleep(pause)
+        return r
+
+    for _ in range(len(need) + 1):
+        missing = [d for d in need if d not in got and d not in tried]
+        if not missing:
+            break
+        r = ask(missing[0])
+        if r and r["days"]:
+            got.update(r["days"])
+        elif r:
+            errors.append(f"{missing[0]}: {r['error']}")
+
+    # ConfirmTkt caches per (train, class, from, to, start date): re-asking the same start date
+    # returns the same snapshot, but an earlier start date is a different key whose answer
+    # still contains the target date. Use that to refresh stale dates.
+    if max_age:
+        for d in need:
+            age = age_minutes((got.get(d) or {}).get("ts"))
+            if age is None or age <= max_age:
+                continue
+            attempts = 0
+            for k in range(1, 8):  # non-running start dates just fail with 533, so walk back a week
+                start = (dt.date.fromisoformat(d) - dt.timedelta(days=k)).isoformat()
+                if start in tried:
+                    continue
+                if attempts == 3:
+                    break
+                attempts += 1
+                r = ask(start)
+                x = r and r["days"].get(d)
+                if x and (age_minutes(x.get("ts")) or 1e9) < age:
+                    for dd, v in r["days"].items():  # take every date this answer improves
+                        if dd in got and (age_minutes(v.get("ts")) or 1e9) < (age_minutes(got[dd].get("ts")) or 1e9):
+                            got[dd] = v
+                    if age_minutes(x.get("ts")) <= max_age:
+                        break
     return f"{job['train']}|{job['from']}|{cls}", {"days": got, "fare": fare, "timeStamps": stamps,
                                                     "errors": errors, "needed": need}
 
@@ -406,11 +488,18 @@ def cmd_fetch(a):
     plan = json.load(open(a.plan))
     classes = [c.strip().upper() for c in a.classes.split(",") if c.strip()]
     results = json.load(open(a.out)) if a.resume and os.path.exists(a.out) else {}
+    has = {t["train"]: set(t.get("classes") or []) for t in plan["trains"]}
+    lacking = sorted({f"{j['train']} {c}" for j in plan["jobs"] for c in classes
+                      if has.get(j["train"]) and c not in has[j["train"]]})
+    if lacking:
+        log("skipping classes the train does not have: " + ", ".join(lacking))
     tasks = [(j, c) for j in plan["jobs"] for c in classes
-             if f"{j['train']}|{j['from']}|{c}" not in results]
+             if f"{j['train']}|{j['from']}|{c}" not in results
+             and (not has.get(j["train"]) or c in has[j["train"]])]
     log(f"{len(tasks)} lookups, {a.workers} workers (ConfirmTkt live API)")
     with ThreadPoolExecutor(max_workers=a.workers) as ex:
-        futs = [ex.submit(fetch_one, j, c, j.get("to", plan["to"]), a.quota, a.pause) for j, c in tasks]
+        futs = [ex.submit(fetch_one, j, c, j.get("to", plan["to"]), a.quota, a.pause, a.max_age)
+                for j, c in tasks]
         for i, f in enumerate(as_completed(futs), 1):
             key, val = f.result()
             results[key] = val
@@ -434,7 +523,7 @@ LABELS = {
         "skipped": "Skip ki gayi trains", "errors": "Jo fetch nahi ho paaya",
         "legend": ("(+1) = agla din. `@STN` = is class ke liye best from-station; bracket mein {frm} ka apna "
                    "status. % = ConfirmTkt ka confirm chance (sirf andaza). Same Pool letter = un stations "
-                   "ka status bilkul same hai (ek hi quota), wahan se book karne ka fayda nahi."),
+                   "ka status bilkul same hai (ek hi quota), wahan se book karne ka fayda nahi. † = ConfirmTkt ka purana cache (2 ghante se zyada), IRCTC pe dobara dekho."),
         "source": "Data: ConfirmTkt live availability (IRCTC se), {t0} – {t1} IST. Route/timetable: erail.in.",
         "none": "Is raat koi train nahi.",
     },
@@ -446,7 +535,7 @@ LABELS = {
         "skipped": "Skipped trains", "errors": "Not fetched",
         "legend": ("(+1) = next day. `@STN` = best from-station for that class; brackets show {frm}'s own "
                    "status. % = ConfirmTkt confirmation estimate. Same Pool letter = identical status "
-                   "(same quota), so booking from there gains nothing."),
+                   "(same quota), so booking from there gains nothing. † = older ConfirmTkt cache snapshot (>2 h); re-check on IRCTC."),
         "source": "Data: ConfirmTkt live availability (sourced from IRCTC), {t0} – {t1} IST. Route/timetable: erail.in.",
         "none": "No train this night.",
     },
@@ -470,7 +559,11 @@ def cmd_report(a):
             return None
         rank, label = parse_status(x.get("status"))
         pred = (x.get("pred") or "").replace(" Chance", "") if rank[0] == 2 else ""
-        return {"rank": rank, "label": label, "pred": pred, "fare": r.get("fare"), "raw": x.get("status")}
+        age = age_minutes(x.get("ts")) if x.get("ts") else None
+        if age is not None and a.stale and age > a.stale:
+            label += "†"
+        return {"rank": rank, "label": label, "pred": pred, "fare": r.get("fare"), "raw": x.get("status"),
+                "ts": x.get("ts")}
 
     def show(c, pred=True, bold=True):
         if not c:
@@ -567,6 +660,15 @@ def cmd_report(a):
     tail = []
     if plan["skipped"]:
         tail += [f"\n## {L['skipped']}", ""] + [f"- {s['train']} {s['name']}: {s['reason']}" for s in plan["skipped"]]
+    # Classes ConfirmTkt sells but erail's coach list doesn't show: the WL may never confirm.
+    doubt = sorted({(t["train"], c) for t in plan["trains"] for c in classes
+                    if t.get("coaches") and c not in t["coaches"]
+                    and any(res.get(f"{t['train']}|{s['code']}|{c}", {}).get("days") for s in t["stations"])})
+    if doubt:
+        note = (" — erail ki coach list mein is class ka coach nahi dikhta; IRCTC pe class dikhe tabhi bharosa karo."
+                if a.lang == "hinglish" else
+                " — not in erail's coach composition; trust only if IRCTC lists the class.")
+        tail += ["", "Coach check: " + ", ".join(f"{tn} {c}" for tn, c in doubt) + note]
     errs = [(k, v) for k, v in res.items() if v.get("errors") or set(v.get("needed", [])) - set(v["days"])]
     if errs:
         tail += [f"\n## {L['errors']}", ""]
@@ -695,6 +797,9 @@ def main():
     s.add_argument("--workers", type=int, default=6)
     s.add_argument("--pause", type=float, default=1.0, help="seconds between calls per worker")
     s.add_argument("--resume", action="store_true", help="keep results already in --out")
+    s.add_argument("--max-age", type=float, default=90,
+                   help="minutes; dates served from an older ConfirmTkt cache snapshot are re-asked via an "
+                        "earlier start date (0 = off)")
     s.add_argument("--out", default="avl.json")
     s.set_defaults(fn=cmd_fetch)
 
@@ -704,6 +809,8 @@ def main():
     s.add_argument("--classes", default="", help="default: classes present in --avl")
     s.add_argument("--lang", choices=sorted(LABELS), default="hinglish")
     s.add_argument("--outdir", default=".")
+    s.add_argument("--stale", type=float, default=120,
+                   help="mark cells whose ConfirmTkt snapshot is older than this many minutes with † (0 = off)")
     s.set_defaults(fn=cmd_report)
 
     a = p.parse_args()
