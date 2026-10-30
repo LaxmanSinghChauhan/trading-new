@@ -72,6 +72,8 @@ Francisco and others get their native UI font. Sizes (Tailwind `fontSize` tokens
 - Desktop: macOS-style **sidebar** (source list) + content. Mobile: translucent top bar with a
   horizontally scrolling nav row. Never horizontal page scroll; wide tables scroll inside their card.
 - Content max width ~1150px; reading text ≤ 70ch.
+- A tall hero card gets its own full row; don't let short tiles beside it stretch into empty boxes.
+- Secondary buttons on the canvas use `surface` + `shadow-card`; a `fill` background vanishes on `canvas`.
 - Group related rows into **inset grouped lists** (one rounded card, hairline separators inset
   from the left edge) instead of a separate card per item.
 
@@ -107,7 +109,8 @@ Francisco and others get their native UI font. Sizes (Tailwind `fontSize` tokens
   When refreshing data that's already shown, keep the old values visible; no flicker.
 - **Empty:** icon + short title + one sentence on what will appear and when (`<EmptyState />`).
 - **Error:** say what happened and what to do, with a Try Again button (`<ErrorState />`). No stack
-  traces, status codes, or URLs.
+  traces, status codes, or URLs. Never reassure about state the UI can't verify ("your positions are
+  unaffected") while the backend is unreachable.
 - Live screens poll quietly and **pause while the tab is hidden** (`useApi(..., { refreshMs })`).
 
 ## 8. Accessibility (non-negotiable)
@@ -148,6 +151,9 @@ Plain, calm, operator-facing. Say what the thing is and what happens next.
 - [ ] `npm run build` passes
 
 ## Going deeper
+
+The general, stack-agnostic version of this skill (tokens.css, retrofit layer, review checklist,
+contrast script) lives in LaxmanSinghChauhan/Ai-skills under `plugins/apple-ux`.
 
 For a searchable database of styles, palettes, and 100+ UX rules, install the community skill
 **ui-ux-pro-max** (MIT): `/plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill` then
