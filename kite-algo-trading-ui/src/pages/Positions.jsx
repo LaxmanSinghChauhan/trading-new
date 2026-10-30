@@ -1,53 +1,89 @@
-import { useEffect, useState } from "react";
+import PageHeader from "../components/PageHeader";
+import Pnl from "../components/Pnl";
+import { EmptyState, ErrorState, Skeleton } from "../components/States";
+import { useApi } from "../hooks/useApi";
 import { fetchPositions } from "../api/client";
+import { formatINR } from "../lib/format";
+
+const columns = ["Symbol", "Quantity", "Entry", "Last", "Stop loss", "Unrealized"];
 
 export default function Positions() {
-  const [positions, setPositions] = useState([]);
+  const { data: positions, error, loading, reload } = useApi(fetchPositions, { refreshMs: 5000 });
 
-  useEffect(() => {
-    fetchPositions().then(setPositions).catch(() => setPositions([]));
-  }, []);
+  if (error && !positions) {
+    return (
+      <section>
+        <PageHeader title="Positions" />
+        <ErrorState onRetry={reload} />
+      </section>
+    );
+  }
 
   return (
-    <section className="grid gap-5">
-      <div>
-        <h2 className="text-3xl font-black tracking-[-0.05em] text-ink">Positions</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-          Open positions come from `/api/positions` and reflect the paper/live lifecycle managed by the new engine.
-        </p>
-      </div>
-      <div className="overflow-hidden rounded-3xl border border-black/5 bg-white/80">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-black/5 text-xs uppercase tracking-[0.16em] text-slate-500">
-            <tr>
-              <th className="px-5 py-4">Symbol</th>
-              <th className="px-5 py-4">Token</th>
-              <th className="px-5 py-4">Entry</th>
-              <th className="px-5 py-4">Last</th>
-              <th className="px-5 py-4">Qty</th>
-              <th className="px-5 py-4">Unrealized</th>
-            </tr>
-          </thead>
-          <tbody>
-            {positions.length ? (
-              positions.map((position) => (
-                <tr key={position.symbol} className="border-t border-black/5">
-                  <td className="px-5 py-4 font-semibold text-ink">{position.symbol}</td>
-                  <td className="px-5 py-4 text-slate-600">{position.instrumentToken}</td>
-                  <td className="px-5 py-4">{position.entryPrice}</td>
-                  <td className="px-5 py-4">{position.lastPrice}</td>
-                  <td className="px-5 py-4">{position.remainingQuantity}/{position.totalQuantity}</td>
-                  <td className="px-5 py-4">{position.unrealizedPnl}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td className="px-5 py-6 text-slate-500" colSpan="6">No open positions.</td>
+    <section>
+      <PageHeader title="Positions" subtitle="Open trades the engine is managing right now." />
+      {!loading && !positions?.length ? (
+        <EmptyState
+          icon="positions"
+          title="No open positions"
+          message="When the engine enters a trade, it shows up here with live P&L."
+        />
+      ) : (
+        <div className="card overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-body">
+            <thead>
+              <tr className="border-b border-separator text-footnote text-secondary">
+                {columns.map((column, index) => (
+                  <th
+                    key={column}
+                    scope="col"
+                    className={`px-5 py-3 font-medium ${index === 0 ? "text-left" : "text-right"}`}
+                  >
+                    {column}
+                  </th>
+                ))}
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {loading
+                ? [0, 1, 2].map((row) => (
+                    <tr key={row} className="border-b border-separator last:border-0">
+                      {columns.map((column, index) => (
+                        <td key={column} className="px-5 py-4">
+                          <Skeleton className={`h-4 w-16 ${index === 0 ? "" : "ml-auto"}`} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                : positions.map((position) => (
+                    <tr
+                      key={position.symbol}
+                      className="border-b border-separator transition-colors duration-fast last:border-0 hover:bg-fill/60"
+                    >
+                      <th scope="row" className="px-5 py-4 text-left font-semibold text-label">
+                        {position.symbol}
+                        {position.trailingActive && (
+                          <span className="ml-2 text-footnote font-normal text-accent">Trailing</span>
+                        )}
+                      </th>
+                      <td className="px-5 py-4 text-right tabular-nums">
+                        {position.remainingQuantity}
+                        <span className="text-secondary"> / {position.totalQuantity}</span>
+                      </td>
+                      <td className="px-5 py-4 text-right tabular-nums">{formatINR(position.entryPrice)}</td>
+                      <td className="px-5 py-4 text-right tabular-nums">{formatINR(position.lastPrice)}</td>
+                      <td className="px-5 py-4 text-right tabular-nums text-secondary">
+                        {formatINR(position.trailStopPrice ?? position.stopLossPrice)}
+                      </td>
+                      <td className="px-5 py-4 text-right font-medium">
+                        <Pnl value={position.unrealizedPnl} />
+                      </td>
+                    </tr>
+                  ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </section>
   );
 }

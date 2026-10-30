@@ -2,15 +2,131 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color: #182321;
-  background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 30%),
-    radial-gradient(circle at top right, rgba(180, 83, 9, 0.18), transparent 26%),
-    linear-gradient(160deg, #f9f3e8 0%, #f0eadf 40%, #ebe5db 100%);
-  font-family: "Avenir Next", "Segoe UI", sans-serif;
+@layer base {
+  :root {
+    color-scheme: light;
+    --canvas: 245 245 247;
+    --surface: 255 255 255;
+    --fill: 242 242 247;
+    --label: 29 29 31;
+    --secondary: 110 110 115;
+    --tertiary: 134 134 139;
+    --separator: 229 229 234;
+    --accent: 0 102 204;
+    --positive: 26 116 49;
+    --negative: 192 0 19;
+    --caution: 181 47 0;
+    --material: 255 255 255;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.04);
+    --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --canvas: 0 0 0;
+      --surface: 28 28 30;
+      --fill: 44 44 46;
+      --label: 245 245 247;
+      --secondary: 161 161 166;
+      --tertiary: 110 110 115;
+      --separator: 56 56 58;
+      --accent: 41 151 255;
+      --positive: 48 209 88;
+      --negative: 255 105 97;
+      --caution: 255 159 10;
+      --material: 22 22 23;
+      --shadow-card: none;
+    }
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply min-h-screen bg-canvas font-sans text-body text-label;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgb(var(--accent) / 0.5);
+    outline-offset: 2px;
+  }
 }
 
-body {
-  min-height: 100vh;
+@layer components {
+  /* Translucent chrome (sidebar, top bar). Content stays opaque. */
+  .material {
+    background-color: rgb(var(--material) / 0.72);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  .card {
+    @apply rounded-card bg-surface shadow-card;
+  }
+
+  .pressable {
+    transition:
+      transform 150ms var(--ease-apple),
+      background-color 150ms var(--ease-apple),
+      color 150ms var(--ease-apple);
+  }
+
+  .pressable:active {
+    transform: scale(0.97);
+  }
+
+  .skeleton {
+    @apply rounded-md bg-fill;
+    animation: breathe 1.4s ease-in-out infinite;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  /* Fade in and rise 8px. Stagger with style={{ "--i": index }}. */
+  .animate-rise {
+    animation: rise 350ms var(--ease-apple) both;
+    animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,49 +1,132 @@
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import Icon from "./Icon";
 
-export default function Navbar() {
-  const [clock, setClock] = useState(() =>
-    new Intl.DateTimeFormat("en-IN", {
-      timeZone: "Asia/Kolkata",
-      dateStyle: "medium",
-      timeStyle: "medium"
-    }).format(new Date())
-  );
+const clockFormat = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23"
+});
 
+const dayFormat = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  weekday: "short",
+  day: "numeric",
+  month: "short"
+});
+
+const partsFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Kolkata",
+  weekday: "short",
+  hour: "numeric",
+  minute: "numeric",
+  hourCycle: "h23"
+});
+
+// NSE equity hours, 09:15–15:30 IST on weekdays. Exchange holidays aren't modelled.
+function marketSession(date) {
+  const parts = Object.fromEntries(partsFormat.formatToParts(date).map((part) => [part.type, part.value]));
+  const minutes = Number(parts.hour) * 60 + Number(parts.minute);
+  const weekday = !["Sat", "Sun"].includes(parts.weekday);
+  if (weekday && minutes >= 555 && minutes < 930) return { label: "Market hours", tone: "bg-positive" };
+  if (weekday && minutes >= 540 && minutes < 555) return { label: "Pre-open", tone: "bg-caution" };
+  return { label: "After hours", tone: "bg-tertiary" };
+}
+
+function useNow() {
+  const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const timer = setInterval(() => {
-      setClock(
-        new Intl.DateTimeFormat("en-IN", {
-          timeZone: "Asia/Kolkata",
-          dateStyle: "medium",
-          timeStyle: "medium"
-        }).format(new Date())
-      );
-    }, 1000);
-
+    const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+  return now;
+}
+
+function Brand() {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-accent text-white">
+        <Icon name="positions" className="h-5 w-5" strokeWidth={2.25} />
+      </div>
+      <div className="leading-tight">
+        <div className="text-headline font-semibold text-label">Momentum</div>
+        <div className="text-footnote text-secondary">Control Room</div>
+      </div>
+    </div>
+  );
+}
+
+function SessionStatus({ now, compact = false }) {
+  const session = marketSession(now);
+  return (
+    <div className={compact ? "flex items-center gap-2" : "rounded-control bg-fill px-3 py-2.5"}>
+      <div className="flex items-center gap-2 text-footnote font-medium text-label">
+        <span className={`h-2 w-2 rounded-full ${session.tone}`} aria-hidden="true" />
+        {session.label}
+      </div>
+      {!compact && (
+        <div className="mt-1 text-footnote tabular-nums text-secondary">
+          {dayFormat.format(now)} · {clockFormat.format(now)} IST
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Navbar({ items }) {
+  const now = useNow();
 
   return (
-    <header className="rounded-[30px] border border-black/5 bg-white/75 p-6 shadow-cloud backdrop-blur">
-      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-2 text-xs uppercase tracking-[0.22em] text-slate-500">
-            <span className="h-2.5 w-2.5 rounded-full bg-green-600 shadow-[0_0_0_8px_rgba(22,163,74,0.12)]" />
-            Momentum Control Room
-          </div>
-          <h1 className="mt-4 max-w-3xl text-4xl font-black tracking-[-0.06em] text-ink md:text-6xl">
-            Operator portal for paper-mode validation and live-readiness.
-          </h1>
-          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 md:text-base">
-            React/Vite/Tailwind workspace scaffolded for the v1 admin portal. The backend already exposes
-            the runtime APIs for health, signals, risk, positions, config, and news.
-          </p>
+    <>
+      <aside className="material sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-separator px-3 py-5 md:flex">
+        <div className="px-3">
+          <Brand />
         </div>
-        <div className="rounded-3xl border border-black/5 bg-white/85 px-5 py-4 text-sm font-semibold text-slate-700">
-          {clock}
-          <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">Asia/Kolkata</div>
+        <nav aria-label="Main" className="mt-8 flex flex-1 flex-col gap-0.5">
+          {items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === "/"}
+              className={({ isActive }) =>
+                `pressable flex items-center gap-3 rounded-control px-3 py-2 text-body font-medium ${
+                  isActive ? "bg-accent/12 text-accent" : "text-label hover:bg-fill"
+                }`
+              }
+            >
+              <Icon name={item.icon} />
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <SessionStatus now={now} />
+      </aside>
+
+      <header className="material sticky top-0 z-20 border-b border-separator md:hidden">
+        <div className="flex items-center justify-between px-4 pb-2 pt-3">
+          <Brand />
+          <SessionStatus now={now} compact />
         </div>
-      </div>
-    </header>
+        <nav aria-label="Main" className="no-scrollbar flex gap-1 overflow-x-auto px-3 pb-2">
+          {items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === "/"}
+              className={({ isActive }) =>
+                `pressable flex min-h-[44px] shrink-0 items-center gap-2 rounded-full px-4 text-body font-medium ${
+                  isActive ? "bg-accent/12 text-accent" : "text-secondary"
+                }`
+              }
+            >
+              <Icon name={item.icon} className="h-4 w-4" />
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+      </header>
+    </>
   );
 }

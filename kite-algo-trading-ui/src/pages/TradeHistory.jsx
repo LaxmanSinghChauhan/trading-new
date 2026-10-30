@@ -1,45 +1,67 @@
-import { useEffect, useState } from "react";
+import PageHeader from "../components/PageHeader";
+import Badge from "../components/Badge";
+import Pnl from "../components/Pnl";
+import { EmptyState, ErrorState, Skeleton } from "../components/States";
+import { useApi } from "../hooks/useApi";
 import { fetchTradeHistory } from "../api/client";
+import { formatINR, formatTimestamp, humanize } from "../lib/format";
+
+const statusTone = { OPEN: "accent", CLOSING: "caution", CLOSED: "neutral", FAILED_EXIT: "negative" };
 
 export default function TradeHistory() {
-  const [rows, setRows] = useState([]);
-
-  useEffect(() => {
-    fetchTradeHistory().then(setRows).catch(() => setRows([]));
-  }, []);
+  const { data: rows, error, loading, reload } = useApi(fetchTradeHistory);
 
   return (
-    <section className="grid gap-5">
-      <div>
-        <h2 className="text-3xl font-black tracking-[-0.05em] text-ink">Trade History</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-          The new `trade_log` and `trade_leg_log` schema supports partial exits and audit trails. This view is
-          scaffolded around `/api/positions/history`.
-        </p>
-      </div>
-      <div className="grid gap-4">
-        {rows.length ? (
-          rows.map((row) => (
-            <div key={row.trade.id} className="rounded-3xl border border-black/5 bg-white/80 p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <div className="text-xl font-bold text-ink">{row.trade.symbol}</div>
-                  <div className="mt-1 text-sm text-slate-600">{row.trade.status} • {row.trade.finalExitReason || "Open"}</div>
-                </div>
-                <div className="rounded-full bg-ember/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-ember">
-                  Net {row.trade.netPnl}
-                </div>
-              </div>
-              <div className="mt-4 text-sm text-slate-600">Entry {row.trade.entryPriceVwap} • Exit {row.trade.exitPriceVwap || "--"}</div>
-              <div className="mt-2 text-sm text-slate-600">Legs recorded: {row.legs.length}</div>
-            </div>
-          ))
-        ) : (
-          <div className="rounded-3xl border border-black/5 bg-white/80 p-6 text-slate-500">
-            No trade history yet.
-          </div>
-        )}
-      </div>
+    <section>
+      <PageHeader title="Trade History" subtitle="The last 50 trades, newest first, with every partial exit recorded." />
+      {error && !rows ? (
+        <ErrorState onRetry={reload} />
+      ) : !loading && !rows?.length ? (
+        <EmptyState
+          icon="history"
+          title="No trades yet"
+          message="Completed and open trades will be listed here with entry, exit, and net P&L after charges."
+        />
+      ) : (
+        <ul className="card divide-y divide-separator overflow-hidden">
+          {loading
+            ? [0, 1, 2].map((row) => (
+                <li key={row} className="flex items-center justify-between px-5 py-4">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-4 w-24" />
+                </li>
+              ))
+            : rows.map(({ trade, legs }, index) => (
+                <li
+                  key={trade.id}
+                  className="animate-rise flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4"
+                  style={{ "--i": index }}
+                >
+                  <div className="min-w-[10rem] flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-headline font-semibold text-label">{trade.symbol}</span>
+                      <Badge tone={statusTone[trade.status] ?? "neutral"}>{humanize(trade.status)}</Badge>
+                    </div>
+                    <div className="mt-0.5 text-footnote tabular-nums text-secondary">
+                      {formatTimestamp(trade.entryTime)}
+                      {trade.finalExitReason && ` · ${humanize(trade.finalExitReason)}`}
+                      {` · ${legs.length} ${legs.length === 1 ? "leg" : "legs"}`}
+                    </div>
+                  </div>
+                  <div className="text-right text-footnote tabular-nums text-secondary">
+                    <div>
+                      {formatINR(trade.entryPriceVwap)} → {formatINR(trade.exitPriceVwap)}
+                    </div>
+                    <div>entry → exit</div>
+                  </div>
+                  <div className="w-36 text-right">
+                    <Pnl value={trade.netPnl} className="text-headline font-semibold" />
+                    <div className="text-footnote text-secondary">net after charges</div>
+                  </div>
+                </li>
+              ))}
+        </ul>
+      )}
     </section>
   );
 }
